@@ -39,5 +39,7 @@ to:
     functions:
       - clang_
       - CX
+    types:
+      - CX
   use_when_else: yes
   no_build_tag: yes

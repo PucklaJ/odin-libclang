@@ -14,7 +14,7 @@ main :: proc() {
         0,
         nil,
         0,
-        u32(clang.CXTranslationUnit_Flags.CXTranslationUnit_None),
+        u32(clang.TranslationUnit_Flags.CXTranslationUnit_None),
     )
 
     if unit == nil {
@@ -27,9 +27,9 @@ main :: proc() {
     clang.visitChildren(
         cursor,
         proc "c" (
-            cursor, parent: clang.CXCursor,
-            client_data: clang.CXClientData,
-        ) -> clang.CXChildVisitResult {
+            cursor, parent: clang.Cursor,
+            client_data: clang.ClientData,
+        ) -> clang.ChildVisitResult {
             context = runtime.default_context()
 
             current_display_name := clang.getCursorDisplayName(cursor)
@@ -49,7 +49,7 @@ main :: proc() {
             defer clang.disposeString(parent_spell)
 
             line, column, offset: [2]u32 = ---, ---, ---
-            file: clang.CXFile = ---
+            file: clang.File = ---
 
             clang.getExpansionLocation(
                 clang.getRangeStart(cursor_range),
@@ -91,7 +91,7 @@ main :: proc() {
 
             #partial switch kind {
             case .CXCursor_BinaryOperator:
-                tokens_arr: [^]clang.CXToken = ---
+                tokens_arr: [^]clang.Token = ---
                 num_tokens: u32 = ---
 
                 clang.tokenize(unit, cursor_range, &tokens_arr, &num_tokens)
@@ -113,7 +113,7 @@ main :: proc() {
                     )
                 }
             case .CXCursor_IntegerLiteral:
-                tokens_arr: [^]clang.CXToken = ---
+                tokens_arr: [^]clang.Token = ---
                 num_tokens: u32 = ---
 
                 clang.tokenize(unit, cursor_range, &tokens_arr, &num_tokens)
