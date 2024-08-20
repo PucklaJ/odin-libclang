@@ -27,10 +27,17 @@ from:
     - shared/clang-c/Platform.h
     - shared/clang-c/Rewrite.h
   includedirs: shared
+  overwrite.windows:
+    types:
+      time_t: '#SInt32'
+  overwrite:
+    types:
+      time_t: '#SInt64'
   ignore:
     macros:
       - 'LLVM_*'
       - 'CINDEX_*'
+    types: '__time_t'
 to:
   language: odin
   package: clang
