@@ -30,7 +30,6 @@ make-directory DIR:
 [windows]
 install-library DIR='build': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
   if (-not (Test-Path build\cache\llvm.tar.xz)) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz }
-  Remove-Item "build\cache\llvm\*" -Recurse -Force -ErrorAction SilentlyContinue
-  tar -xf build\cache\llvm.tar.xz -C build\cache\llvm --strip-components=1
+  if (-not (Test-Path build\cache\llvm\bin\libclang.dll)) { tar -xf build\cache\llvm.tar.xz -C build\cache\llvm --strip-components=1 }
   Copy-Item -Path build\cache\llvm\bin\libclang.dll -Destination {{ DIR }} -Force
 
