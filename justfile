@@ -28,7 +28,9 @@ make-directory DIR:
   @New-Item -Path "{{ DIR }}" -ItemType Directory -Force | Out-Null
 
 [windows]
-install-library DIR='build': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
+download-library DIR='build': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
+  @echo This will download llvm including libclang.dll and then copy libclang.dll into the given directory
+
   if (-not (Test-Path build\cache\llvm.tar.xz)) { if (Get-Command -Name 'curl.exe' -ErrorAction SilentlyContinue) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz } else { Invoke-Webrequest -Uri {{ LIBRARY_DOWNLOAD_LINK }} -OutFile build\cache\llvm.tar.xz } }
   if (-not (Test-Path build\cache\libclang.dll)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-18.1.8-x86_64-pc-windows-msvc/bin/libclang.dll" }
   Copy-Item -Path build\cache\libclang.dll -Destination {{ DIR }} -Force
