@@ -29,10 +29,23 @@ from:
     types:
       time_t: '#SInt64'
     functions: &overwrite_functions
-      clang_parseTranslationUnit: 'CXTranslationUnit CIdx CXIndex source_filename #String #Attr ReadOnly #AttrEnd command_line_args #String #Attr ReadOnly Ptr 1 ReadOnly #AttrEnd num_command_line_args #SInt32 unsaved_files CXUnsavedFile #Attr Ptr 1 #AttrEnd num_unsaved_files #UInt32 options CXTranslationUnit_Flags'
-      clang_parseTranslationUnit2: 'CXErrorCode CIdx CXIndex source_filename #String #Attr ReadOnly #AttrEnd command_line_args #String #Attr ReadOnly Ptr 1 ReadOnly #AttrEnd num_command_line_args #SInt32 unsaved_files CXUnsavedFile #Attr Ptr 1 #AttrEnd num_unsaved_files #UInt32 options CXTranslationUnit_Flags out_TU CXTranslationUnit #Attr Ptr 1 #AttrEnd'
-      clang_parseTranslationUnit2FullArgv: 'CXErrorCode CIdx CXIndex source_filename #String #Attr ReadOnly #AttrEnd command_line_args #String #Attr ReadOnly Ptr 1 ReadOnly #AttrEnd num_command_line_args #SInt32 unsaved_files CXUnsavedFile #Attr Ptr 1 #AttrEnd num_unsaved_files #UInt32 options CXTranslationUnit_Flags out_TU CXTranslationUnit #Attr Ptr 1 #AttrEnd'
-      clang_defaultEditingTranslationUnitOptions: 'CXTranslationUnit_Flags'
+      clang_parseTranslationUnit.param.6.type: 'CXTranslationUnit_Flags'
+      clang_parseTranslationUnit2.param.6.type: 'CXTranslationUnit_Flags'
+      clang_parseTranslationUnit2FullArgv.param.6.type: 'CXTranslationUnit_Flags'
+      clang_defaultEditingTranslationUnitOptions.return: 'CXTranslationUnit_Flags'
+      clang_getFileUniqueID.return: "#Bool32"
+      clang_File_isEqual.return: "#Bool32"
+      clang_Location_isInSystemHeader.return: "#Bool32"
+      clang_Location_isFromMainFile.return: "#Bool32"
+      clang_Range_isNull.return: "#Bool32"
+      clang_saveTranslationUnit.return: "CXSaveError"
+      clang_Cursor_hasVarDeclGlobalStorage.return: "#Bool32"
+      clang_Cursor_hasVarDeclExternalStorage.return: "#Bool32"
+      clang_getExceptionSpecificationType.return: "CXCursor_ExceptionSpecificationKind"
+      clang_getCursorExceptionSpecificationType.return: "CXCursor_ExceptionSpecificationKind"
+      clang_Cursor_isDynamicCall.return: "#Bool32"
+      clang_Module_isSystem.return: "#Bool32"
+      clang_index_isEntityObjCContainerKind.return: "#Bool32"
   overwrite.windows:
     types:
       time_t: '#SInt32'
