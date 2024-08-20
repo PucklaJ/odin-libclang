@@ -426,10 +426,10 @@ foreign clang_runic {
     getFileTime :: proc(SFile: File) -> time_t ---
 
     @(link_name = "clang_getFileUniqueID")
-    getFileUniqueID :: proc(file: File, outID: ^FileUniqueID) -> i32 ---
+    getFileUniqueID :: proc(file: File, outID: ^FileUniqueID) -> b32 ---
 
     @(link_name = "clang_File_isEqual")
-    File_isEqual :: proc(file1: File, file2: File) -> i32 ---
+    File_isEqual :: proc(file1: File, file2: File) -> b32 ---
 
     @(link_name = "clang_File_tryGetRealPathName")
     File_tryGetRealPathName :: proc(file: File) -> String ---
@@ -441,10 +441,10 @@ foreign clang_runic {
     equalLocations :: proc(loc1: SourceLocation, loc2: SourceLocation) -> u32 ---
 
     @(link_name = "clang_Location_isInSystemHeader")
-    Location_isInSystemHeader :: proc(location: SourceLocation) -> i32 ---
+    Location_isInSystemHeader :: proc(location: SourceLocation) -> b32 ---
 
     @(link_name = "clang_Location_isFromMainFile")
-    Location_isFromMainFile :: proc(location: SourceLocation) -> i32 ---
+    Location_isFromMainFile :: proc(location: SourceLocation) -> b32 ---
 
     @(link_name = "clang_getNullRange")
     getNullRange :: proc() -> SourceRange ---
@@ -456,7 +456,7 @@ foreign clang_runic {
     equalRanges :: proc(range1: SourceRange, range2: SourceRange) -> u32 ---
 
     @(link_name = "clang_Range_isNull")
-    Range_isNull :: proc(range: SourceRange) -> i32 ---
+    Range_isNull :: proc(range: SourceRange) -> b32 ---
 
     @(link_name = "clang_getExpansionLocation")
     getExpansionLocation :: proc(location: SourceLocation, file: ^File, line: ^u32, column: ^u32, offset: ^u32) ---
@@ -687,7 +687,7 @@ foreign clang_runic {
     defaultSaveOptions :: proc(TU: TranslationUnit) -> u32 ---
 
     @(link_name = "clang_saveTranslationUnit")
-    saveTranslationUnit :: proc(TU: TranslationUnit, FileName: cstring, options: u32) -> i32 ---
+    saveTranslationUnit :: proc(TU: TranslationUnit, FileName: cstring, options: u32) -> SaveError ---
 
     @(link_name = "clang_suspendTranslationUnit")
     suspendTranslationUnit :: proc(param0: TranslationUnit) -> u32 ---
@@ -792,10 +792,10 @@ foreign clang_runic {
     Cursor_getVarDeclInitializer :: proc(cursor: Cursor) -> Cursor ---
 
     @(link_name = "clang_Cursor_hasVarDeclGlobalStorage")
-    Cursor_hasVarDeclGlobalStorage :: proc(cursor: Cursor) -> i32 ---
+    Cursor_hasVarDeclGlobalStorage :: proc(cursor: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_hasVarDeclExternalStorage")
-    Cursor_hasVarDeclExternalStorage :: proc(cursor: Cursor) -> i32 ---
+    Cursor_hasVarDeclExternalStorage :: proc(cursor: Cursor) -> b32 ---
 
     @(link_name = "clang_getCursorLanguage")
     getCursorLanguage :: proc(cursor: Cursor) -> LanguageKind ---
@@ -945,7 +945,7 @@ foreign clang_runic {
     getResultType :: proc(T: Type) -> Type ---
 
     @(link_name = "clang_getExceptionSpecificationType")
-    getExceptionSpecificationType :: proc(T: Type) -> i32 ---
+    getExceptionSpecificationType :: proc(T: Type) -> Cursor_ExceptionSpecificationKind ---
 
     @(link_name = "clang_getNumArgTypes")
     getNumArgTypes :: proc(T: Type) -> i32 ---
@@ -975,7 +975,7 @@ foreign clang_runic {
     getCursorResultType :: proc(C: Cursor) -> Type ---
 
     @(link_name = "clang_getCursorExceptionSpecificationType")
-    getCursorExceptionSpecificationType :: proc(C: Cursor) -> i32 ---
+    getCursorExceptionSpecificationType :: proc(C: Cursor) -> Cursor_ExceptionSpecificationKind ---
 
     @(link_name = "clang_isPODType")
     isPODType :: proc(T: Type) -> u32 ---
@@ -1125,7 +1125,7 @@ foreign clang_runic {
     Cursor_getObjCSelectorIndex :: proc(param0: Cursor) -> i32 ---
 
     @(link_name = "clang_Cursor_isDynamicCall")
-    Cursor_isDynamicCall :: proc(C: Cursor) -> i32 ---
+    Cursor_isDynamicCall :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_getReceiverType")
     Cursor_getReceiverType :: proc(C: Cursor) -> Type ---
@@ -1188,7 +1188,7 @@ foreign clang_runic {
     Module_getFullName :: proc(module: Module) -> String ---
 
     @(link_name = "clang_Module_isSystem")
-    Module_isSystem :: proc(module: Module) -> i32 ---
+    Module_isSystem :: proc(module: Module) -> b32 ---
 
     @(link_name = "clang_Module_getNumTopLevelHeaders")
     Module_getNumTopLevelHeaders :: proc(param0: TranslationUnit, module: Module) -> u32 ---
@@ -1422,7 +1422,7 @@ foreign clang_runic {
     findIncludesInFileWithBlock :: proc(param0: TranslationUnit, param1: File, param2: CursorAndRangeVisitorBlock) -> Result ---
 
     @(link_name = "clang_index_isEntityObjCContainerKind")
-    index_isEntityObjCContainerKind :: proc(param0: IdxEntityKind) -> i32 ---
+    index_isEntityObjCContainerKind :: proc(param0: IdxEntityKind) -> b32 ---
 
     @(link_name = "clang_index_getObjCContainerDeclInfo")
     index_getObjCContainerDeclInfo :: proc(param0: ^IdxDeclInfo) -> ^IdxObjCContainerDeclInfo ---
