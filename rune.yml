@@ -41,5 +41,59 @@ to:
       - CX
     types:
       - CX
+    constants:
+      - CXCompilationDatabase_
+      - CXDiagnostic_
+      - CXLoadDiag_
+      - CXDiagnostic_Display
+      - CXError_
+      - CXComment_
+      - CXCommentInlineCommandRenderKind_
+      - CXCommentParamPassDirection_
+      - CXAvailability_
+      - CXCursor_ExceptionSpecificationKind_
+      - CXChoice_
+      - CXGlobalOpt_
+      - CXTranslationUnit_
+      - CXSaveTranslationUnit_
+      - CXSaveError_
+      - CXReparse_
+      - CXTUResourceUsage_
+      - CXCursor_
+      - CXLinkage_
+      - CXVisibility_
+      - CXLanguage_
+      - CXTLS_
+      - CXType_
+      - CXCallingConv_
+      - CXTemplateArgumentKind_
+      - CXTypeNullability_
+      - CXTypeLayoutError_
+      - CXRefQualifier_
+      - CX_CXX
+      - CX_SC_
+      - CXChildVisit_
+      - CXPrintingPolicy_
+      - CXObjCPropertyAttr_
+      - CXObjCDeclQualifier_
+      - CXNameRange_
+      - CXToken_
+      - CXCompletionChunk_
+      - CXCodeComplete_
+      - CXCompletionContext_
+      - CXEval_
+      - CXVisit_
+      - CXResult_
+      - CXEntity_
+      - CXIdxEntityLang_
+      - CXIdxEntity_
+      - CXIdxAttr_
+      - CXIdxDeclFlag_
+      - CXIdxObjCContainer_
+      - CXIdxEntityRef_
+      - CXSymbolRole_
+      - CXIndexOpt_
+      - CXBinaryOperator_
+      - CXUnaryOperator_
   use_when_else: yes
   no_build_tag: yes

@@ -14,7 +14,7 @@ main :: proc() {
         0,
         nil,
         0,
-        u32(clang.TranslationUnit_Flags.CXTranslationUnit_None),
+        u32(clang.TranslationUnit_Flags.None),
     )
 
     if unit == nil {
@@ -81,7 +81,7 @@ main :: proc() {
             )
 
             #partial switch type.kind {
-            case .CXType_Pointer:
+            case .Pointer:
                 pointee := clang.getPointeeType(type)
                 pointee_spelling := clang.getTypeSpelling(pointee)
                 defer clang.disposeString(pointee_spelling)
@@ -90,7 +90,7 @@ main :: proc() {
             }
 
             #partial switch kind {
-            case .CXCursor_BinaryOperator:
+            case .BinaryOperator:
                 tokens_arr: [^]clang.Token = ---
                 num_tokens: u32 = ---
 
@@ -112,7 +112,7 @@ main :: proc() {
                         clang.getCString(right_spell),
                     )
                 }
-            case .CXCursor_IntegerLiteral:
+            case .IntegerLiteral:
                 tokens_arr: [^]clang.Token = ---
                 num_tokens: u32 = ---
 
@@ -127,7 +127,7 @@ main :: proc() {
                 }
             }
 
-            return .CXChildVisit_Recurse
+            return .Recurse
         },
         nil,
     )
