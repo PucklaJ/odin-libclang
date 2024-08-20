@@ -1,4 +1,4 @@
-//+build amd64, arm64
+//+build windows amd64, !windows amd64, !windows arm64
 package clang
 
 VirtualFileOverlay :: rawptr
@@ -281,12 +281,6 @@ FieldVisitor :: #type proc "c" (C: Cursor, client_data: ClientData) -> VisitorRe
 BinaryOperatorKind :: enum u32 {Invalid = 0, PtrMemD = 1, PtrMemI = 2, Mul = 3, Div = 4, Rem = 5, Add = 6, Sub = 7, Shl = 8, Shr = 9, Cmp = 10, LT = 11, GT = 12, LE = 13, GE = 14, EQ = 15, NE = 16, And = 17, Xor = 18, Or = 19, LAnd = 20, LOr = 21, Assign = 22, MulAssign = 23, DivAssign = 24, RemAssign = 25, AddAssign = 26, SubAssign = 27, ShlAssign = 28, ShrAssign = 29, AndAssign = 30, XorAssign = 31, OrAssign = 32, Comma = 33, }
 UnaryOperatorKind :: enum u32 {Invalid = 0, PostInc = 1, PostDec = 2, PreInc = 3, PreDec = 4, AddrOf = 5, Deref = 6, Plus = 7, Minus = 8, Not = 9, LNot = 10, Real = 11, Imag = 12, Extension = 13, Coawait = 14, }
 Rewriter :: rawptr
-
-when #config(CLANG_STATIC, false) {
-    foreign import clang_runic "system:libclang.a"
-} else {
-    foreign import clang_runic "system:clang"
-}
 
 @(default_calling_convention = "c")
 foreign clang_runic {
@@ -1535,6 +1529,8 @@ TUResourceUsageEntry :: struct {
 }
 time_t :: i32
 
+foreign import clang_runic "lib/windows/x86_64/libclang.lib"
+
 } else {
 
 UnsavedFile :: struct {
@@ -1547,6 +1543,16 @@ TUResourceUsageEntry :: struct {
     amount: u64,
 }
 time_t :: i64
+
+when #config(CLANG_STATIC, false) {
+    when ODIN_OS == .Darwin {
+    foreign import clang_runic "system:clang"
+} else {
+    foreign import clang_runic "system:libclang.a"
+}
+} else {
+    foreign import clang_runic "system:clang"
+}
 
 }
 

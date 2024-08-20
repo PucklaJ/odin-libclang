@@ -3,15 +3,13 @@ platforms:
   - Linux x86_64
   - Windows x86_64
   - Macos x86_64
-  - BSD x86_64
-  - Linux arm64
-  - Windows arm64
-  - Macos arm64
-  - BSD arm64
 from:
   language: c
   shared: libclang.so
-  static: libclang.a
+  shared.windows.x86_64: lib/windows/x86_64/libclang.lib
+  static.linux: &static_lib libclang.a
+  static.macos: *static_lib
+  static.bsd: *static_lib
   headers:
     - shared/clang-c/BuildSystem.h
     - shared/clang-c/CXCompilationDatabase.h
@@ -110,3 +108,4 @@ to:
       - CXUnaryOperator_
   use_when_else: yes
   no_build_tag: yes
+  ignore_arch: yes
