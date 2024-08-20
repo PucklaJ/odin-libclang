@@ -381,10 +381,10 @@ foreign clang_runic {
     disposeDiagnostic :: proc(Diagnostic: Diagnostic) ---
 
     @(link_name = "clang_formatDiagnostic")
-    formatDiagnostic :: proc(Diagnostic: Diagnostic, Options: u32) -> String ---
+    formatDiagnostic :: proc(Diagnostic: Diagnostic, Options: DiagnosticDisplayOptions) -> String ---
 
     @(link_name = "clang_defaultDiagnosticDisplayOptions")
-    defaultDiagnosticDisplayOptions :: proc() -> u32 ---
+    defaultDiagnosticDisplayOptions :: proc() -> DiagnosticDisplayOptions ---
 
     @(link_name = "clang_getDiagnosticSeverity")
     getDiagnosticSeverity :: proc(param0: Diagnostic) -> DiagnosticSeverity ---
@@ -438,7 +438,7 @@ foreign clang_runic {
     getNullLocation :: proc() -> SourceLocation ---
 
     @(link_name = "clang_equalLocations")
-    equalLocations :: proc(loc1: SourceLocation, loc2: SourceLocation) -> u32 ---
+    equalLocations :: proc(loc1: SourceLocation, loc2: SourceLocation) -> b32 ---
 
     @(link_name = "clang_Location_isInSystemHeader")
     Location_isInSystemHeader :: proc(location: SourceLocation) -> b32 ---
@@ -453,7 +453,7 @@ foreign clang_runic {
     getRange :: proc(begin: SourceLocation, end: SourceLocation) -> SourceRange ---
 
     @(link_name = "clang_equalRanges")
-    equalRanges :: proc(range1: SourceRange, range2: SourceRange) -> u32 ---
+    equalRanges :: proc(range1: SourceRange, range2: SourceRange) -> b32 ---
 
     @(link_name = "clang_Range_isNull")
     Range_isNull :: proc(range: SourceRange) -> b32 ---
@@ -504,7 +504,7 @@ foreign clang_runic {
     Comment_getChild :: proc(comment: Comment, ChildIdx: u32) -> Comment ---
 
     @(link_name = "clang_Comment_isWhitespace")
-    Comment_isWhitespace :: proc(comment: Comment) -> u32 ---
+    Comment_isWhitespace :: proc(comment: Comment) -> b32 ---
 
     @(link_name = "clang_InlineContentComment_hasTrailingNewline")
     InlineContentComment_hasTrailingNewline :: proc(comment: Comment) -> u32 ---
@@ -528,7 +528,7 @@ foreign clang_runic {
     HTMLTagComment_getTagName :: proc(comment: Comment) -> String ---
 
     @(link_name = "clang_HTMLStartTagComment_isSelfClosing")
-    HTMLStartTagComment_isSelfClosing :: proc(comment: Comment) -> u32 ---
+    HTMLStartTagComment_isSelfClosing :: proc(comment: Comment) -> b32 ---
 
     @(link_name = "clang_HTMLStartTag_getNumAttrs")
     HTMLStartTag_getNumAttrs :: proc(comment: Comment) -> u32 ---
@@ -555,13 +555,13 @@ foreign clang_runic {
     ParamCommandComment_getParamName :: proc(comment: Comment) -> String ---
 
     @(link_name = "clang_ParamCommandComment_isParamIndexValid")
-    ParamCommandComment_isParamIndexValid :: proc(comment: Comment) -> u32 ---
+    ParamCommandComment_isParamIndexValid :: proc(comment: Comment) -> b32 ---
 
     @(link_name = "clang_ParamCommandComment_getParamIndex")
     ParamCommandComment_getParamIndex :: proc(comment: Comment) -> u32 ---
 
     @(link_name = "clang_ParamCommandComment_isDirectionExplicit")
-    ParamCommandComment_isDirectionExplicit :: proc(comment: Comment) -> u32 ---
+    ParamCommandComment_isDirectionExplicit :: proc(comment: Comment) -> b32 ---
 
     @(link_name = "clang_ParamCommandComment_getDirection")
     ParamCommandComment_getDirection :: proc(comment: Comment) -> CommentParamPassDirection ---
@@ -570,7 +570,7 @@ foreign clang_runic {
     TParamCommandComment_getParamName :: proc(comment: Comment) -> String ---
 
     @(link_name = "clang_TParamCommandComment_isParamPositionValid")
-    TParamCommandComment_isParamPositionValid :: proc(comment: Comment) -> u32 ---
+    TParamCommandComment_isParamPositionValid :: proc(comment: Comment) -> b32 ---
 
     @(link_name = "clang_TParamCommandComment_getDepth")
     TParamCommandComment_getDepth :: proc(comment: Comment) -> u32 ---
@@ -624,13 +624,13 @@ foreign clang_runic {
     Index_setGlobalOptions :: proc(param0: Index, options: u32) ---
 
     @(link_name = "clang_CXIndex_getGlobalOptions")
-    Index_getGlobalOptions :: proc(param0: Index) -> u32 ---
+    Index_getGlobalOptions :: proc(param0: Index) -> GlobalOptFlags ---
 
     @(link_name = "clang_CXIndex_setInvocationEmissionPathOption")
     Index_setInvocationEmissionPathOption :: proc(param0: Index, Path: cstring) ---
 
     @(link_name = "clang_isFileMultipleIncludeGuarded")
-    isFileMultipleIncludeGuarded :: proc(tu: TranslationUnit, file: File) -> u32 ---
+    isFileMultipleIncludeGuarded :: proc(tu: TranslationUnit, file: File) -> b32 ---
 
     @(link_name = "clang_getFile")
     getFile :: proc(tu: TranslationUnit, file_name: cstring) -> File ---
@@ -684,10 +684,10 @@ foreign clang_runic {
     parseTranslationUnit2FullArgv :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: TranslationUnit_Flags, out_TU: ^TranslationUnit) -> ErrorCode ---
 
     @(link_name = "clang_defaultSaveOptions")
-    defaultSaveOptions :: proc(TU: TranslationUnit) -> u32 ---
+    defaultSaveOptions :: proc(TU: TranslationUnit) -> SaveTranslationUnit_Flags ---
 
     @(link_name = "clang_saveTranslationUnit")
-    saveTranslationUnit :: proc(TU: TranslationUnit, FileName: cstring, options: u32) -> SaveError ---
+    saveTranslationUnit :: proc(TU: TranslationUnit, FileName: cstring, options: SaveTranslationUnit_Flags) -> SaveError ---
 
     @(link_name = "clang_suspendTranslationUnit")
     suspendTranslationUnit :: proc(param0: TranslationUnit) -> u32 ---
@@ -696,10 +696,10 @@ foreign clang_runic {
     disposeTranslationUnit :: proc(param0: TranslationUnit) ---
 
     @(link_name = "clang_defaultReparseOptions")
-    defaultReparseOptions :: proc(TU: TranslationUnit) -> u32 ---
+    defaultReparseOptions :: proc(TU: TranslationUnit) -> Reparse_Flags ---
 
     @(link_name = "clang_reparseTranslationUnit")
-    reparseTranslationUnit :: proc(TU: TranslationUnit, num_unsaved_files: u32, unsaved_files: [^]UnsavedFile, options: u32) -> i32 ---
+    reparseTranslationUnit :: proc(TU: TranslationUnit, num_unsaved_files: u32, unsaved_files: [^]UnsavedFile, options: Reparse_Flags) -> i32 ---
 
     @(link_name = "clang_getTUResourceUsageName")
     getTUResourceUsageName :: proc(kind: TUResourceUsageKind) -> cstring ---
@@ -729,7 +729,7 @@ foreign clang_runic {
     getTranslationUnitCursor :: proc(param0: TranslationUnit) -> Cursor ---
 
     @(link_name = "clang_equalCursors")
-    equalCursors :: proc(param0: Cursor, param1: Cursor) -> u32 ---
+    equalCursors :: proc(param0: Cursor, param1: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isNull")
     Cursor_isNull :: proc(cursor: Cursor) -> i32 ---
@@ -741,37 +741,37 @@ foreign clang_runic {
     getCursorKind :: proc(param0: Cursor) -> CursorKind ---
 
     @(link_name = "clang_isDeclaration")
-    isDeclaration :: proc(param0: CursorKind) -> u32 ---
+    isDeclaration :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isInvalidDeclaration")
-    isInvalidDeclaration :: proc(param0: Cursor) -> u32 ---
+    isInvalidDeclaration :: proc(param0: Cursor) -> b32 ---
 
     @(link_name = "clang_isReference")
-    isReference :: proc(param0: CursorKind) -> u32 ---
+    isReference :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isExpression")
-    isExpression :: proc(param0: CursorKind) -> u32 ---
+    isExpression :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isStatement")
-    isStatement :: proc(param0: CursorKind) -> u32 ---
+    isStatement :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isAttribute")
-    isAttribute :: proc(param0: CursorKind) -> u32 ---
+    isAttribute :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_Cursor_hasAttrs")
-    Cursor_hasAttrs :: proc(C: Cursor) -> u32 ---
+    Cursor_hasAttrs :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_isInvalid")
-    isInvalid :: proc(param0: CursorKind) -> u32 ---
+    isInvalid :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isTranslationUnit")
-    isTranslationUnit :: proc(param0: CursorKind) -> u32 ---
+    isTranslationUnit :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isPreprocessing")
-    isPreprocessing :: proc(param0: CursorKind) -> u32 ---
+    isPreprocessing :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_isUnexposed")
-    isUnexposed :: proc(param0: CursorKind) -> u32 ---
+    isUnexposed :: proc(param0: CursorKind) -> b32 ---
 
     @(link_name = "clang_getCursorLinkage")
     getCursorLinkage :: proc(cursor: Cursor) -> LinkageKind ---
@@ -813,7 +813,7 @@ foreign clang_runic {
     disposeCXCursorSet :: proc(cset: CursorSet) ---
 
     @(link_name = "clang_CXCursorSet_contains")
-    CursorSet_contains :: proc(cset: CursorSet, cursor: Cursor) -> u32 ---
+    CursorSet_contains :: proc(cset: CursorSet, cursor: Cursor) -> b32 ---
 
     @(link_name = "clang_CXCursorSet_insert")
     CursorSet_insert :: proc(cset: CursorSet, cursor: Cursor) -> u32 ---
@@ -861,7 +861,7 @@ foreign clang_runic {
     getEnumConstantDeclUnsignedValue :: proc(C: Cursor) -> u64 ---
 
     @(link_name = "clang_Cursor_isBitField")
-    Cursor_isBitField :: proc(C: Cursor) -> u32 ---
+    Cursor_isBitField :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_getFieldDeclBitWidth")
     getFieldDeclBitWidth :: proc(C: Cursor) -> i32 ---
@@ -888,13 +888,13 @@ foreign clang_runic {
     Cursor_getTemplateArgumentUnsignedValue :: proc(C: Cursor, I: u32) -> u64 ---
 
     @(link_name = "clang_equalTypes")
-    equalTypes :: proc(A: Type, B: Type) -> u32 ---
+    equalTypes :: proc(A: Type, B: Type) -> b32 ---
 
     @(link_name = "clang_getCanonicalType")
     getCanonicalType :: proc(T: Type) -> Type ---
 
     @(link_name = "clang_isConstQualifiedType")
-    isConstQualifiedType :: proc(T: Type) -> u32 ---
+    isConstQualifiedType :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_Cursor_isMacroFunctionLike")
     Cursor_isMacroFunctionLike :: proc(C: Cursor) -> u32 ---
@@ -906,10 +906,10 @@ foreign clang_runic {
     Cursor_isFunctionInlined :: proc(C: Cursor) -> u32 ---
 
     @(link_name = "clang_isVolatileQualifiedType")
-    isVolatileQualifiedType :: proc(T: Type) -> u32 ---
+    isVolatileQualifiedType :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_isRestrictQualifiedType")
-    isRestrictQualifiedType :: proc(T: Type) -> u32 ---
+    isRestrictQualifiedType :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_getAddressSpace")
     getAddressSpace :: proc(T: Type) -> u32 ---
@@ -969,7 +969,7 @@ foreign clang_runic {
     Type_getObjCTypeArg :: proc(T: Type, i: u32) -> Type ---
 
     @(link_name = "clang_isFunctionTypeVariadic")
-    isFunctionTypeVariadic :: proc(T: Type) -> u32 ---
+    isFunctionTypeVariadic :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_getCursorResultType")
     getCursorResultType :: proc(C: Cursor) -> Type ---
@@ -978,7 +978,7 @@ foreign clang_runic {
     getCursorExceptionSpecificationType :: proc(C: Cursor) -> Cursor_ExceptionSpecificationKind ---
 
     @(link_name = "clang_isPODType")
-    isPODType :: proc(T: Type) -> u32 ---
+    isPODType :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_getElementType")
     getElementType :: proc(T: Type) -> Type ---
@@ -996,7 +996,7 @@ foreign clang_runic {
     Type_getNamedType :: proc(T: Type) -> Type ---
 
     @(link_name = "clang_Type_isTransparentTagTypedef")
-    Type_isTransparentTagTypedef :: proc(T: Type) -> u32 ---
+    Type_isTransparentTagTypedef :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_Type_getNullability")
     Type_getNullability :: proc(T: Type) -> TypeNullabilityKind ---
@@ -1023,13 +1023,13 @@ foreign clang_runic {
     Cursor_getOffsetOfField :: proc(C: Cursor) -> i64 ---
 
     @(link_name = "clang_Cursor_isAnonymous")
-    Cursor_isAnonymous :: proc(C: Cursor) -> u32 ---
+    Cursor_isAnonymous :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isAnonymousRecordDecl")
-    Cursor_isAnonymousRecordDecl :: proc(C: Cursor) -> u32 ---
+    Cursor_isAnonymousRecordDecl :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isInlineNamespace")
-    Cursor_isInlineNamespace :: proc(C: Cursor) -> u32 ---
+    Cursor_isInlineNamespace :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Type_getNumTemplateArguments")
     Type_getNumTemplateArguments :: proc(T: Type) -> i32 ---
@@ -1041,7 +1041,7 @@ foreign clang_runic {
     Type_getCXXRefQualifier :: proc(T: Type) -> RefQualifierKind ---
 
     @(link_name = "clang_isVirtualBase")
-    isVirtualBase :: proc(param0: Cursor) -> u32 ---
+    isVirtualBase :: proc(param0: Cursor) -> b32 ---
 
     @(link_name = "clang_getCXXAccessSpecifier")
     getCXXAccessSpecifier :: proc(param0: Cursor) -> CX_CXXAccessSpecifier ---
@@ -1059,10 +1059,10 @@ foreign clang_runic {
     getIBOutletCollectionType :: proc(param0: Cursor) -> Type ---
 
     @(link_name = "clang_visitChildren")
-    visitChildren :: proc(parent: Cursor, visitor: CursorVisitor, client_data: ClientData) -> u32 ---
+    visitChildren :: proc(parent: Cursor, visitor: CursorVisitor, client_data: ClientData) -> b32 ---
 
     @(link_name = "clang_visitChildrenWithBlock")
-    visitChildrenWithBlock :: proc(parent: Cursor, block: CursorVisitorBlock) -> u32 ---
+    visitChildrenWithBlock :: proc(parent: Cursor, block: CursorVisitorBlock) -> b32 ---
 
     @(link_name = "clang_getCursorUSR")
     getCursorUSR :: proc(param0: Cursor) -> String ---
@@ -1116,7 +1116,7 @@ foreign clang_runic {
     getCursorDefinition :: proc(param0: Cursor) -> Cursor ---
 
     @(link_name = "clang_isCursorDefinition")
-    isCursorDefinition :: proc(param0: Cursor) -> u32 ---
+    isCursorDefinition :: proc(param0: Cursor) -> b32 ---
 
     @(link_name = "clang_getCanonicalCursor")
     getCanonicalCursor :: proc(param0: Cursor) -> Cursor ---
@@ -1143,13 +1143,13 @@ foreign clang_runic {
     Cursor_getObjCDeclQualifiers :: proc(C: Cursor) -> u32 ---
 
     @(link_name = "clang_Cursor_isObjCOptional")
-    Cursor_isObjCOptional :: proc(C: Cursor) -> u32 ---
+    Cursor_isObjCOptional :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isVariadic")
-    Cursor_isVariadic :: proc(C: Cursor) -> u32 ---
+    Cursor_isVariadic :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isExternalSymbol")
-    Cursor_isExternalSymbol :: proc(C: Cursor, language: ^String, definedIn: ^String, isGenerated: ^u32) -> u32 ---
+    Cursor_isExternalSymbol :: proc(C: Cursor, language: ^String, definedIn: ^String, isGenerated: ^u32) -> b32 ---
 
     @(link_name = "clang_Cursor_getCommentRange")
     Cursor_getCommentRange :: proc(C: Cursor) -> SourceRange ---
@@ -1197,52 +1197,52 @@ foreign clang_runic {
     Module_getTopLevelHeader :: proc(param0: TranslationUnit, module: Module, Index: u32) -> File ---
 
     @(link_name = "clang_CXXConstructor_isConvertingConstructor")
-    XConstructor_isConvertingConstructor :: proc(C: Cursor) -> u32 ---
+    Constructor_isConvertingConstructor :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXConstructor_isCopyConstructor")
-    XConstructor_isCopyConstructor :: proc(C: Cursor) -> u32 ---
+    Constructor_isCopyConstructor :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXConstructor_isDefaultConstructor")
-    XConstructor_isDefaultConstructor :: proc(C: Cursor) -> u32 ---
+    Constructor_isDefaultConstructor :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXConstructor_isMoveConstructor")
-    XConstructor_isMoveConstructor :: proc(C: Cursor) -> u32 ---
+    Constructor_isMoveConstructor :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXField_isMutable")
-    XField_isMutable :: proc(C: Cursor) -> u32 ---
+    Field_isMutable :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isDefaulted")
-    XMethod_isDefaulted :: proc(C: Cursor) -> u32 ---
+    Method_isDefaulted :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isDeleted")
-    XMethod_isDeleted :: proc(C: Cursor) -> u32 ---
+    Method_isDeleted :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isPureVirtual")
-    XMethod_isPureVirtual :: proc(C: Cursor) -> u32 ---
+    Method_isPureVirtual :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isStatic")
-    XMethod_isStatic :: proc(C: Cursor) -> u32 ---
+    Method_isStatic :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isVirtual")
-    XMethod_isVirtual :: proc(C: Cursor) -> u32 ---
+    Method_isVirtual :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isCopyAssignmentOperator")
-    XMethod_isCopyAssignmentOperator :: proc(C: Cursor) -> u32 ---
+    Method_isCopyAssignmentOperator :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isMoveAssignmentOperator")
-    XMethod_isMoveAssignmentOperator :: proc(C: Cursor) -> u32 ---
+    Method_isMoveAssignmentOperator :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isExplicit")
-    XMethod_isExplicit :: proc(C: Cursor) -> u32 ---
+    Method_isExplicit :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXRecord_isAbstract")
-    XRecord_isAbstract :: proc(C: Cursor) -> u32 ---
+    Record_isAbstract :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_EnumDecl_isScoped")
-    EnumDecl_isScoped :: proc(C: Cursor) -> u32 ---
+    EnumDecl_isScoped :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_CXXMethod_isConst")
-    XMethod_isConst :: proc(C: Cursor) -> u32 ---
+    Method_isConst :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_getTemplateCursorKind")
     getTemplateCursorKind :: proc(C: Cursor) -> CursorKind ---
@@ -1329,10 +1329,10 @@ foreign clang_runic {
     getCompletionFixIt :: proc(results: [^]CodeCompleteResults, completion_index: u32, fixit_index: u32, replacement_range: ^SourceRange) -> String ---
 
     @(link_name = "clang_defaultCodeCompleteOptions")
-    defaultCodeCompleteOptions :: proc() -> u32 ---
+    defaultCodeCompleteOptions :: proc() -> CodeComplete_Flags ---
 
     @(link_name = "clang_codeCompleteAt")
-    codeCompleteAt :: proc(TU: TranslationUnit, complete_filename: cstring, complete_line: u32, complete_column: u32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: u32) -> ^CodeCompleteResults ---
+    codeCompleteAt :: proc(TU: TranslationUnit, complete_filename: cstring, complete_line: u32, complete_column: u32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: CodeComplete_Flags) -> ^CodeCompleteResults ---
 
     @(link_name = "clang_sortCodeCompletionResults")
     sortCodeCompletionResults :: proc(Results: [^]CompletionResult, NumResults: u32) ---
@@ -1380,7 +1380,7 @@ foreign clang_runic {
     EvalResult_getAsLongLong :: proc(E: EvalResult) -> i64 ---
 
     @(link_name = "clang_EvalResult_isUnsignedInt")
-    EvalResult_isUnsignedInt :: proc(E: EvalResult) -> u32 ---
+    EvalResult_isUnsignedInt :: proc(E: EvalResult) -> b32 ---
 
     @(link_name = "clang_EvalResult_getAsUnsigned")
     EvalResult_getAsUnsigned :: proc(E: EvalResult) -> u64 ---
@@ -1479,7 +1479,7 @@ foreign clang_runic {
     indexLoc_getCXSourceLocation :: proc(loc: IdxLoc) -> SourceLocation ---
 
     @(link_name = "clang_Type_visitFields")
-    Type_visitFields :: proc(T: Type, visitor: FieldVisitor, client_data: ClientData) -> u32 ---
+    Type_visitFields :: proc(T: Type, visitor: FieldVisitor, client_data: ClientData) -> b32 ---
 
     @(link_name = "clang_getBinaryOperatorKindSpelling")
     getBinaryOperatorKindSpelling :: proc(kind: BinaryOperatorKind) -> String ---
