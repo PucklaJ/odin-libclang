@@ -2,6 +2,12 @@ set windows-shell := ['powershell.exe']
 
 RUNIC := 'runic'
 
+LIBRARY_DOWNLOAD_LINK := if os() == 'windows' {
+  'https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang+llvm-18.1.8-x86_64-pc-windows-msvc.tar.xz'
+} else {
+  'https://idontexist.io'
+}
+
 default: bindings
 
 bindings:
@@ -21,4 +27,10 @@ make-directory DIR:
 make-directory DIR:
   @New-Item -Path "{{ DIR }}" -ItemType Directory -Force | Out-Null
 
+[windows]
+install-library DIR='build': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
+  if (-not (Test-Path build\cache\llvm.tar.xz)) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz }
+  Remove-Item "build\cache\llvm\*" -Recurse -Force -ErrorAction SilentlyContinue
+  tar -xf build\cache\llvm.tar.xz -C build\cache\llvm --strip-components=1
+  Copy-Item -Path build\cache\llvm\bin\libclang.dll -Destination {{ DIR }} -Force
 
