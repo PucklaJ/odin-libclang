@@ -897,13 +897,13 @@ foreign clang_runic {
     isConstQualifiedType :: proc(T: Type) -> b32 ---
 
     @(link_name = "clang_Cursor_isMacroFunctionLike")
-    Cursor_isMacroFunctionLike :: proc(C: Cursor) -> u32 ---
+    Cursor_isMacroFunctionLike :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isMacroBuiltin")
-    Cursor_isMacroBuiltin :: proc(C: Cursor) -> u32 ---
+    Cursor_isMacroBuiltin :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_Cursor_isFunctionInlined")
-    Cursor_isFunctionInlined :: proc(C: Cursor) -> u32 ---
+    Cursor_isFunctionInlined :: proc(C: Cursor) -> b32 ---
 
     @(link_name = "clang_isVolatileQualifiedType")
     isVolatileQualifiedType :: proc(T: Type) -> b32 ---
