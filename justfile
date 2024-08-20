@@ -29,7 +29,7 @@ make-directory DIR:
 
 [windows]
 install-library DIR='build': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
-  if (-not (Test-Path build\cache\llvm.tar.xz)) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz }
+  if (-not (Test-Path build\cache\llvm.tar.xz)) { if (Get-Command -Name 'curl.exe' -ErrorAction SilentlyContinue) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz } else { Invoke-Webrequest -Uri {{ LIBRARY_DOWNLOAD_LINK }} -OutFile build\cache\llvm.tar.xz } }
   if (-not (Test-Path build\cache\llvm\bin\libclang.dll)) { tar -xf build\cache\llvm.tar.xz -C build\cache\llvm --strip-components=1 }
   Copy-Item -Path build\cache\llvm\bin\libclang.dll -Destination {{ DIR }} -Force
 
