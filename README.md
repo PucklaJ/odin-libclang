@@ -1,6 +1,6 @@
 # Odin libclang
 
-Odin bindings to the libclang library of the LLVM project.
+Odin bindings to the libclang library of the LLVM project. These bindings have been generated using [runic](https://github.com/Samudevv/runic).
 
 ## License of LLVM
 
