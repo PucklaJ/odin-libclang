@@ -14,7 +14,7 @@ main :: proc() {
         0,
         nil,
         0,
-        u32(clang.TranslationUnit_Flags.None),
+        .None,
     )
 
     if unit == nil {

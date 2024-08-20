@@ -678,16 +678,16 @@ foreign clang_runic {
     createTranslationUnit2 :: proc(CIdx: Index, ast_filename: cstring, out_TU: ^TranslationUnit) -> ErrorCode ---
 
     @(link_name = "clang_defaultEditingTranslationUnitOptions")
-    defaultEditingTranslationUnitOptions :: proc() -> u32 ---
+    defaultEditingTranslationUnitOptions :: proc() -> TranslationUnit_Flags ---
 
     @(link_name = "clang_parseTranslationUnit")
-    parseTranslationUnit :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: u32) -> TranslationUnit ---
+    parseTranslationUnit :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: TranslationUnit_Flags) -> TranslationUnit ---
 
     @(link_name = "clang_parseTranslationUnit2")
-    parseTranslationUnit2 :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: u32, out_TU: ^TranslationUnit) -> ErrorCode ---
+    parseTranslationUnit2 :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: TranslationUnit_Flags, out_TU: ^TranslationUnit) -> ErrorCode ---
 
     @(link_name = "clang_parseTranslationUnit2FullArgv")
-    parseTranslationUnit2FullArgv :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: u32, out_TU: ^TranslationUnit) -> ErrorCode ---
+    parseTranslationUnit2FullArgv :: proc(CIdx: Index, source_filename: cstring, command_line_args: [^]cstring, num_command_line_args: i32, unsaved_files: [^]UnsavedFile, num_unsaved_files: u32, options: TranslationUnit_Flags, out_TU: ^TranslationUnit) -> ErrorCode ---
 
     @(link_name = "clang_defaultSaveOptions")
     defaultSaveOptions :: proc(TU: TranslationUnit) -> u32 ---

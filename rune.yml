@@ -27,12 +27,18 @@ from:
     - shared/clang-c/Platform.h
     - shared/clang-c/Rewrite.h
   includedirs: shared
-  overwrite.windows:
-    types:
-      time_t: '#SInt32'
   overwrite:
     types:
       time_t: '#SInt64'
+    functions: &overwrite_functions
+      clang_parseTranslationUnit: 'CXTranslationUnit CIdx CXIndex source_filename #String #Attr ReadOnly #AttrEnd command_line_args #String #Attr ReadOnly Ptr 1 ReadOnly #AttrEnd num_command_line_args #SInt32 unsaved_files CXUnsavedFile #Attr Ptr 1 #AttrEnd num_unsaved_files #UInt32 options CXTranslationUnit_Flags'
+      clang_parseTranslationUnit2: 'CXErrorCode CIdx CXIndex source_filename #String #Attr ReadOnly #AttrEnd command_line_args #String #Attr ReadOnly Ptr 1 ReadOnly #AttrEnd num_command_line_args #SInt32 unsaved_files CXUnsavedFile #Attr Ptr 1 #AttrEnd num_unsaved_files #UInt32 options CXTranslationUnit_Flags out_TU CXTranslationUnit #Attr Ptr 1 #AttrEnd'
+      clang_parseTranslationUnit2FullArgv: 'CXErrorCode CIdx CXIndex source_filename #String #Attr ReadOnly #AttrEnd command_line_args #String #Attr ReadOnly Ptr 1 ReadOnly #AttrEnd num_command_line_args #SInt32 unsaved_files CXUnsavedFile #Attr Ptr 1 #AttrEnd num_unsaved_files #UInt32 options CXTranslationUnit_Flags out_TU CXTranslationUnit #Attr Ptr 1 #AttrEnd'
+      clang_defaultEditingTranslationUnitOptions: 'CXTranslationUnit_Flags'
+  overwrite.windows:
+    types:
+      time_t: '#SInt32'
+    functions: *overwrite_functions
   ignore:
     macros:
       - 'LLVM_*'
