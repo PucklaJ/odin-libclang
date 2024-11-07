@@ -1,4 +1,4 @@
-//+build windows amd64, !windows amd64, !windows arm64
+#+build windows amd64, !windows amd64, !windows arm64
 package clang
 
 VirtualFileOverlay :: rawptr
