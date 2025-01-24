@@ -1,15 +1,18 @@
 version: 0
 platforms:
   - Linux x86_64
+  - Linux arm64
   - Windows x86_64
+  - Windows arm64
   - Macos x86_64
+  - Macos arm64
+  - BSD x86_64
+  - BSD arm64
 from:
   language: c
   shared: libclang.so
   shared.windows.x86_64: lib/windows/x86_64/libclang.lib
-  static.linux: &static_lib libclang.a
-  static.macos: *static_lib
-  static.bsd: *static_lib
+  shared.windows.arm64: lib/windows/arm64/libclang.lib
   headers:
     - shared/clang-c/BuildSystem.h
     - shared/clang-c/CXCompilationDatabase.h
@@ -24,11 +27,17 @@ from:
     - shared/clang-c/Index.h
     - shared/clang-c/Platform.h
     - shared/clang-c/Rewrite.h
-  includedirs: shared
+  includedirs:
+    - 'stdinc'
+    - 'shared'
+  flags:
+    - '-fno-blocks'
+  extern:
+    - 'stdinc/*'
   overwrite:
     types:
-      time_t: '#SInt64'
-    functions: &overwrite_functions
+      CXIndexOptions: '#Opaque'
+    functions:
       clang_parseTranslationUnit.param.6.type: 'CXTranslationUnit_Flags'
       clang_parseTranslationUnit2.param.6.type: 'CXTranslationUnit_Flags'
       clang_parseTranslationUnit2FullArgv.param.6.type: 'CXTranslationUnit_Flags'
@@ -116,19 +125,22 @@ from:
       clang_codeCompleteAt.param.6.type: "CXCodeComplete_Flags"
       clang_EvalResult_isUnsignedInt.return: "#Bool32"
       clang_Type_visitFields.return: "#Bool32"
-  overwrite.windows:
-    types:
-      time_t: '#SInt32'
-    functions: *overwrite_functions
   ignore:
-    macros:
+    constants:
       - 'LLVM_*'
       - 'CINDEX_*'
     types: '__time_t'
+    functions:
+      - 'clang_visitChildrenWithBlock'
+      - 'clang_findReferencesInFileWithBlock'
+      - 'clang_findIncludesInFileWithBlock'
 to:
   language: odin
   package: clang
   out: libclang.odin
+  extern:
+    sources:
+      'stdinc/time.h': 'core:c/libc'
   trim_prefix:
     functions:
       - clang_
@@ -190,6 +202,3 @@ to:
       - CXIndexOpt_
       - CXBinaryOperator_
       - CXUnaryOperator_
-  use_when_else: yes
-  no_build_tag: yes
-  ignore_arch: yes

@@ -8,9 +8,8 @@ default: bindings
 
 bindings:
   {{ RUNIC }}
-  echo '//+build windows amd64, !windows amd64, !windows arm64' > libclang.odin.tmp
-  awk '{gsub(/Comment:/, "comment:"); gsub(/Module:/, "module:"); print}' libclang.odin >> libclang.odin.tmp
-  mv libclang.odin.tmp libclang.odin
+  sed -i libclang.odin \
+      -e 's/\[^\]^Token/^[^]Token/g'
 
 example: (make-directory 'build')
   odin build example -out:build/example{{ if os_family() == 'windows' { '.exe' } else { '' } }} -debug -error-pos-style:unix
@@ -57,3 +56,5 @@ update-sources TAG=LLVM_DEFAULT_TAG: (make-directory 'shared/clang-c')
         curl -SL "https://raw.githubusercontent.com/llvm/llvm-project/refs/tags/{{ TAG }}/clang/include/clang-c/$header_file" --output "shared/clang-c/$header_file"
     done
 
+check TARGET='linux_amd64':
+    odin check . -vet -error-pos-style:unix -no-entry-point -target:{{ TARGET }}

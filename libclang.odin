@@ -1,18 +1,17 @@
-#+build windows amd64, !windows amd64, !windows arm64
+#+build linux amd64, linux arm64, windows amd64, windows arm64, darwin amd64, darwin arm64, freebsd amd64, openbsd amd64, netbsd amd64, freebsd arm64, openbsd arm64, netbsd arm64
 package clang
 
-VirtualFileOverlay :: rawptr
-ModuleMapDescriptor :: rawptr
+import "core:c/libc"
+
+VirtualFileOverlayImpl :: rawptr
+VirtualFileOverlay :: ^VirtualFileOverlayImpl
+ModuleMapDescriptorImpl :: rawptr
+ModuleMapDescriptor :: ^ModuleMapDescriptorImpl
 CompilationDatabase :: rawptr
 CompileCommands :: rawptr
 CompileCommand :: rawptr
-CompilationDatabase_Error :: enum u32 {NoError = 0, CanNotLoadDatabase = 1, }
-DiagnosticSeverity :: enum u32 {Ignored = 0, Note = 1, Warning = 2, Error = 3, Fatal = 4, }
 Diagnostic :: rawptr
 DiagnosticSet :: rawptr
-LoadDiag_Error :: enum u32 {None = 0, Unknown = 1, CannotLoad = 2, InvalidFile = 3, }
-DiagnosticDisplayOptions :: enum u32 {DisplaySourceLocation = 1, DisplayColumn = 2, DisplaySourceRanges = 4, DisplayOption = 8, DisplayCategoryId = 16, DisplayCategoryName = 32, }
-ErrorCode :: enum u32 {Success = 0, Failure = 1, Crashed = 2, InvalidArguments = 3, ASTReadError = 4, }
 File :: rawptr
 FileUniqueID :: struct {
     data: [3]u64,
@@ -38,45 +37,34 @@ StringSet :: struct {
     Strings: [^]String,
     Count: u32,
 }
+TranslationUnitImpl :: rawptr
+TranslationUnit :: ^TranslationUnitImpl
 Comment :: struct {
     ASTNode: rawptr,
-    TranslationUnit: TranslationUnit,
+    TranslationUnit_m: TranslationUnit,
 }
-CommentKind :: enum u32 {Null = 0, Text = 1, InlineCommand = 2, HTMLStartTag = 3, HTMLEndTag = 4, Paragraph = 5, BlockCommand = 6, ParamCommand = 7, TParamCommand = 8, VerbatimBlockCommand = 9, VerbatimBlockLine = 10, VerbatimLine = 11, FullComment = 12, }
-CommentInlineCommandRenderKind :: enum u32 {Normal = 0, Bold = 1, Monospaced = 2, Emphasized = 3, Anchor = 4, }
-CommentParamPassDirection :: enum u32 {In = 0, Out = 1, InOut = 2, }
-APISet :: rawptr
+APISetImpl :: struct #packed {}
+APISet :: ^APISetImpl
 Index :: rawptr
-TargetInfo :: rawptr
-TranslationUnit :: rawptr
+TargetInfoImpl :: rawptr
+TargetInfo :: ^TargetInfoImpl
 ClientData :: rawptr
-AvailabilityKind :: enum u32 {Available = 0, Deprecated = 1, NotAvailable = 2, NotAccessible = 3, }
 Version :: struct {
     Major: i32,
     Minor: i32,
     Subminor: i32,
 }
-Cursor_ExceptionSpecificationKind :: enum u32 {None = 0, DynamicNone = 1, Dynamic = 2, MSAny = 3, BasicNoexcept = 4, ComputedNoexcept = 5, Unevaluated = 6, Uninstantiated = 7, Unparsed = 8, NoThrow = 9, }
-Choice :: enum u32 {Default = 0, Enabled = 1, Disabled = 2, }
-GlobalOptFlags :: enum u32 {None = 0, ThreadBackgroundPriorityForIndexing = 1, ThreadBackgroundPriorityForEditing = 2, ThreadBackgroundPriorityForAll = 3, }
-TranslationUnit_Flags :: enum u32 {None = 0, DetailedPreprocessingRecord = 1, Incomplete = 2, PrecompiledPreamble = 4, CacheCompletionResults = 8, ForSerialization = 16, CXXChainedPCH = 32, SkipFunctionBodies = 64, IncludeBriefCommentsInCodeCompletion = 128, CreatePreambleOnFirstParse = 256, KeepGoing = 512, SingleFileParse = 1024, LimitSkipFunctionBodiesToPreamble = 2048, IncludeAttributedTypes = 4096, VisitImplicitAttributes = 8192, IgnoreNonErrorsFromIncludedFiles = 16384, RetainExcludedConditionalBlocks = 32768, }
-SaveTranslationUnit_Flags :: enum u32 {None = 0, }
-SaveError :: enum u32 {None = 0, Unknown = 1, TranslationErrors = 2, InvalidTU = 3, }
-Reparse_Flags :: enum u32 {None = 0, }
-TUResourceUsageKind :: enum u32 {AST = 1, Identifiers = 2, Selectors = 3, GlobalCompletionResults = 4, SourceManagerContentCache = 5, AST_SideTables = 6, SourceManager_Membuffer_Malloc = 7, SourceManager_Membuffer_MMap = 8, ExternalASTSource_Membuffer_Malloc = 9, ExternalASTSource_Membuffer_MMap = 10, Preprocessor = 11, PreprocessingRecord = 12, SourceManager_DataStructures = 13, Preprocessor_HeaderSearch = 14, MEMORY_IN_BYTES_BEGIN = 1, MEMORY_IN_BYTES_END = 14, First = 1, Last = 14, }
+IndexOptions :: struct #packed {}
 TUResourceUsage :: struct {
     data: rawptr,
     numEntries: u32,
     entries: [^]TUResourceUsageEntry,
 }
-CursorKind :: enum u32 {UnexposedDecl = 1, StructDecl = 2, UnionDecl = 3, ClassDecl = 4, EnumDecl = 5, FieldDecl = 6, EnumConstantDecl = 7, FunctionDecl = 8, VarDecl = 9, ParmDecl = 10, ObjCInterfaceDecl = 11, ObjCCategoryDecl = 12, ObjCProtocolDecl = 13, ObjCPropertyDecl = 14, ObjCIvarDecl = 15, ObjCInstanceMethodDecl = 16, ObjCClassMethodDecl = 17, ObjCImplementationDecl = 18, ObjCCategoryImplDecl = 19, TypedefDecl = 20, CXXMethod = 21, Namespace = 22, LinkageSpec = 23, Constructor = 24, Destructor = 25, ConversionFunction = 26, TemplateTypeParameter = 27, NonTypeTemplateParameter = 28, TemplateTemplateParameter = 29, FunctionTemplate = 30, ClassTemplate = 31, ClassTemplatePartialSpecialization = 32, NamespaceAlias = 33, UsingDirective = 34, UsingDeclaration = 35, TypeAliasDecl = 36, ObjCSynthesizeDecl = 37, ObjCDynamicDecl = 38, CXXAccessSpecifier = 39, FirstDecl = 1, LastDecl = 39, FirstRef = 40, ObjCSuperClassRef = 40, ObjCProtocolRef = 41, ObjCClassRef = 42, TypeRef = 43, CXXBaseSpecifier = 44, TemplateRef = 45, NamespaceRef = 46, MemberRef = 47, LabelRef = 48, OverloadedDeclRef = 49, VariableRef = 50, LastRef = 50, FirstInvalid = 70, InvalidFile = 70, NoDeclFound = 71, NotImplemented = 72, InvalidCode = 73, LastInvalid = 73, FirstExpr = 100, UnexposedExpr = 100, DeclRefExpr = 101, MemberRefExpr = 102, CallExpr = 103, ObjCMessageExpr = 104, BlockExpr = 105, IntegerLiteral = 106, FloatingLiteral = 107, ImaginaryLiteral = 108, StringLiteral = 109, CharacterLiteral = 110, ParenExpr = 111, UnaryOperator = 112, ArraySubscriptExpr = 113, BinaryOperator = 114, CompoundAssignOperator = 115, ConditionalOperator = 116, CStyleCastExpr = 117, CompoundLiteralExpr = 118, InitListExpr = 119, AddrLabelExpr = 120, StmtExpr = 121, GenericSelectionExpr = 122, GNUNullExpr = 123, CXXStaticCastExpr = 124, CXXDynamicCastExpr = 125, CXXReinterpretCastExpr = 126, CXXConstCastExpr = 127, CXXFunctionalCastExpr = 128, CXXTypeidExpr = 129, CXXBoolLiteralExpr = 130, CXXNullPtrLiteralExpr = 131, CXXThisExpr = 132, CXXThrowExpr = 133, CXXNewExpr = 134, CXXDeleteExpr = 135, UnaryExpr = 136, ObjCStringLiteral = 137, ObjCEncodeExpr = 138, ObjCSelectorExpr = 139, ObjCProtocolExpr = 140, ObjCBridgedCastExpr = 141, PackExpansionExpr = 142, SizeOfPackExpr = 143, LambdaExpr = 144, ObjCBoolLiteralExpr = 145, ObjCSelfExpr = 146, OMPArraySectionExpr = 147, ObjCAvailabilityCheckExpr = 148, FixedPointLiteral = 149, OMPArrayShapingExpr = 150, OMPIteratorExpr = 151, CXXAddrspaceCastExpr = 152, ConceptSpecializationExpr = 153, RequiresExpr = 154, CXXParenListInitExpr = 155, LastExpr = 155, FirstStmt = 200, UnexposedStmt = 200, LabelStmt = 201, CompoundStmt = 202, CaseStmt = 203, DefaultStmt = 204, IfStmt = 205, SwitchStmt = 206, WhileStmt = 207, DoStmt = 208, ForStmt = 209, GotoStmt = 210, IndirectGotoStmt = 211, ContinueStmt = 212, BreakStmt = 213, ReturnStmt = 214, GCCAsmStmt = 215, AsmStmt = 215, ObjCAtTryStmt = 216, ObjCAtCatchStmt = 217, ObjCAtFinallyStmt = 218, ObjCAtThrowStmt = 219, ObjCAtSynchronizedStmt = 220, ObjCAutoreleasePoolStmt = 221, ObjCForCollectionStmt = 222, CXXCatchStmt = 223, CXXTryStmt = 224, CXXForRangeStmt = 225, SEHTryStmt = 226, SEHExceptStmt = 227, SEHFinallyStmt = 228, MSAsmStmt = 229, NullStmt = 230, DeclStmt = 231, OMPParallelDirective = 232, OMPSimdDirective = 233, OMPForDirective = 234, OMPSectionsDirective = 235, OMPSectionDirective = 236, OMPSingleDirective = 237, OMPParallelForDirective = 238, OMPParallelSectionsDirective = 239, OMPTaskDirective = 240, OMPMasterDirective = 241, OMPCriticalDirective = 242, OMPTaskyieldDirective = 243, OMPBarrierDirective = 244, OMPTaskwaitDirective = 245, OMPFlushDirective = 246, SEHLeaveStmt = 247, OMPOrderedDirective = 248, OMPAtomicDirective = 249, OMPForSimdDirective = 250, OMPParallelForSimdDirective = 251, OMPTargetDirective = 252, OMPTeamsDirective = 253, OMPTaskgroupDirective = 254, OMPCancellationPointDirective = 255, OMPCancelDirective = 256, OMPTargetDataDirective = 257, OMPTaskLoopDirective = 258, OMPTaskLoopSimdDirective = 259, OMPDistributeDirective = 260, OMPTargetEnterDataDirective = 261, OMPTargetExitDataDirective = 262, OMPTargetParallelDirective = 263, OMPTargetParallelForDirective = 264, OMPTargetUpdateDirective = 265, OMPDistributeParallelForDirective = 266, OMPDistributeParallelForSimdDirective = 267, OMPDistributeSimdDirective = 268, OMPTargetParallelForSimdDirective = 269, OMPTargetSimdDirective = 270, OMPTeamsDistributeDirective = 271, OMPTeamsDistributeSimdDirective = 272, OMPTeamsDistributeParallelForSimdDirective = 273, OMPTeamsDistributeParallelForDirective = 274, OMPTargetTeamsDirective = 275, OMPTargetTeamsDistributeDirective = 276, OMPTargetTeamsDistributeParallelForDirective = 277, OMPTargetTeamsDistributeParallelForSimdDirective = 278, OMPTargetTeamsDistributeSimdDirective = 279, BuiltinBitCastExpr = 280, OMPMasterTaskLoopDirective = 281, OMPParallelMasterTaskLoopDirective = 282, OMPMasterTaskLoopSimdDirective = 283, OMPParallelMasterTaskLoopSimdDirective = 284, OMPParallelMasterDirective = 285, OMPDepobjDirective = 286, OMPScanDirective = 287, OMPTileDirective = 288, OMPCanonicalLoop = 289, OMPInteropDirective = 290, OMPDispatchDirective = 291, OMPMaskedDirective = 292, OMPUnrollDirective = 293, OMPMetaDirective = 294, OMPGenericLoopDirective = 295, OMPTeamsGenericLoopDirective = 296, OMPTargetTeamsGenericLoopDirective = 297, OMPParallelGenericLoopDirective = 298, OMPTargetParallelGenericLoopDirective = 299, OMPParallelMaskedDirective = 300, OMPMaskedTaskLoopDirective = 301, OMPMaskedTaskLoopSimdDirective = 302, OMPParallelMaskedTaskLoopDirective = 303, OMPParallelMaskedTaskLoopSimdDirective = 304, OMPErrorDirective = 305, OMPScopeDirective = 306, LastStmt = 306, TranslationUnit = 350, FirstAttr = 400, UnexposedAttr = 400, IBActionAttr = 401, IBOutletAttr = 402, IBOutletCollectionAttr = 403, CXXFinalAttr = 404, CXXOverrideAttr = 405, AnnotateAttr = 406, AsmLabelAttr = 407, PackedAttr = 408, PureAttr = 409, ConstAttr = 410, NoDuplicateAttr = 411, CUDAConstantAttr = 412, CUDADeviceAttr = 413, CUDAGlobalAttr = 414, CUDAHostAttr = 415, CUDASharedAttr = 416, VisibilityAttr = 417, DLLExport = 418, DLLImport = 419, NSReturnsRetained = 420, NSReturnsNotRetained = 421, NSReturnsAutoreleased = 422, NSConsumesSelf = 423, NSConsumed = 424, ObjCException = 425, ObjCNSObject = 426, ObjCIndependentClass = 427, ObjCPreciseLifetime = 428, ObjCReturnsInnerPointer = 429, ObjCRequiresSuper = 430, ObjCRootClass = 431, ObjCSubclassingRestricted = 432, ObjCExplicitProtocolImpl = 433, ObjCDesignatedInitializer = 434, ObjCRuntimeVisible = 435, ObjCBoxable = 436, FlagEnum = 437, ConvergentAttr = 438, WarnUnusedAttr = 439, WarnUnusedResultAttr = 440, AlignedAttr = 441, LastAttr = 441, PreprocessingDirective = 500, MacroDefinition = 501, MacroExpansion = 502, MacroInstantiation = 502, InclusionDirective = 503, FirstPreprocessing = 500, LastPreprocessing = 503, ModuleImportDecl = 600, TypeAliasTemplateDecl = 601, StaticAssert = 602, FriendDecl = 603, ConceptDecl = 604, FirstExtraDecl = 600, LastExtraDecl = 604, OverloadCandidate = 700, }
 Cursor :: struct {
     kind: CursorKind,
     xdata: i32,
     data: [3]rawptr,
 }
-LinkageKind :: enum u32 {Invalid = 0, NoLinkage = 1, Internal = 2, UniqueExternal = 3, External = 4, }
-VisibilityKind :: enum u32 {Invalid = 0, Hidden = 1, Protected = 2, Default = 3, }
 PlatformAvailability :: struct {
     Platform: String,
     Introduced: Version,
@@ -85,31 +73,18 @@ PlatformAvailability :: struct {
     Unavailable: i32,
     Message: String,
 }
-LanguageKind :: enum u32 {Invalid = 0, C = 1, ObjC = 2, CPlusPlus = 3, }
-TLSKind :: enum u32 {None = 0, Dynamic = 1, Static = 2, }
-CursorSet :: rawptr
-TypeKind :: enum u32 {Invalid = 0, Unexposed = 1, Void = 2, Bool = 3, Char_U = 4, UChar = 5, Char16 = 6, Char32 = 7, UShort = 8, UInt = 9, ULong = 10, ULongLong = 11, UInt128 = 12, Char_S = 13, SChar = 14, WChar = 15, Short = 16, Int = 17, Long = 18, LongLong = 19, Int128 = 20, Float = 21, Double = 22, LongDouble = 23, NullPtr = 24, Overload = 25, Dependent = 26, ObjCId = 27, ObjCClass = 28, ObjCSel = 29, Float128 = 30, Half = 31, Float16 = 32, ShortAccum = 33, Accum = 34, LongAccum = 35, UShortAccum = 36, UAccum = 37, ULongAccum = 38, BFloat16 = 39, Ibm128 = 40, FirstBuiltin = 2, LastBuiltin = 40, Complex = 100, Pointer = 101, BlockPointer = 102, LValueReference = 103, RValueReference = 104, Record = 105, Enum = 106, Typedef = 107, ObjCInterface = 108, ObjCObjectPointer = 109, FunctionNoProto = 110, FunctionProto = 111, ConstantArray = 112, Vector = 113, IncompleteArray = 114, VariableArray = 115, DependentSizedArray = 116, MemberPointer = 117, Auto = 118, Elaborated = 119, Pipe = 120, OCLImage1dRO = 121, OCLImage1dArrayRO = 122, OCLImage1dBufferRO = 123, OCLImage2dRO = 124, OCLImage2dArrayRO = 125, OCLImage2dDepthRO = 126, OCLImage2dArrayDepthRO = 127, OCLImage2dMSAARO = 128, OCLImage2dArrayMSAARO = 129, OCLImage2dMSAADepthRO = 130, OCLImage2dArrayMSAADepthRO = 131, OCLImage3dRO = 132, OCLImage1dWO = 133, OCLImage1dArrayWO = 134, OCLImage1dBufferWO = 135, OCLImage2dWO = 136, OCLImage2dArrayWO = 137, OCLImage2dDepthWO = 138, OCLImage2dArrayDepthWO = 139, OCLImage2dMSAAWO = 140, OCLImage2dArrayMSAAWO = 141, OCLImage2dMSAADepthWO = 142, OCLImage2dArrayMSAADepthWO = 143, OCLImage3dWO = 144, OCLImage1dRW = 145, OCLImage1dArrayRW = 146, OCLImage1dBufferRW = 147, OCLImage2dRW = 148, OCLImage2dArrayRW = 149, OCLImage2dDepthRW = 150, OCLImage2dArrayDepthRW = 151, OCLImage2dMSAARW = 152, OCLImage2dArrayMSAARW = 153, OCLImage2dMSAADepthRW = 154, OCLImage2dArrayMSAADepthRW = 155, OCLImage3dRW = 156, OCLSampler = 157, OCLEvent = 158, OCLQueue = 159, OCLReserveID = 160, ObjCObject = 161, ObjCTypeParam = 162, Attributed = 163, OCLIntelSubgroupAVCMcePayload = 164, OCLIntelSubgroupAVCImePayload = 165, OCLIntelSubgroupAVCRefPayload = 166, OCLIntelSubgroupAVCSicPayload = 167, OCLIntelSubgroupAVCMceResult = 168, OCLIntelSubgroupAVCImeResult = 169, OCLIntelSubgroupAVCRefResult = 170, OCLIntelSubgroupAVCSicResult = 171, OCLIntelSubgroupAVCImeResultSingleReferenceStreamout = 172, OCLIntelSubgroupAVCImeResultDualReferenceStreamout = 173, OCLIntelSubgroupAVCImeSingleReferenceStreamin = 174, OCLIntelSubgroupAVCImeDualReferenceStreamin = 175, OCLIntelSubgroupAVCImeResultSingleRefStreamout = 172, OCLIntelSubgroupAVCImeResultDualRefStreamout = 173, OCLIntelSubgroupAVCImeSingleRefStreamin = 174, OCLIntelSubgroupAVCImeDualRefStreamin = 175, ExtVector = 176, Atomic = 177, BTFTagAttributed = 178, }
-CallingConv :: enum u32 {Default = 0, C = 1, X86StdCall = 2, X86FastCall = 3, X86ThisCall = 4, X86Pascal = 5, AAPCS = 6, AAPCS_VFP = 7, X86RegCall = 8, IntelOclBicc = 9, Win64 = 10, X86_64Win64 = 10, X86_64SysV = 11, X86VectorCall = 12, Swift = 13, PreserveMost = 14, PreserveAll = 15, AArch64VectorCall = 16, SwiftAsync = 17, AArch64SVEPCS = 18, M68kRTD = 19, Invalid = 100, Unexposed = 200, }
+CursorSetImpl :: rawptr
+CursorSet :: ^CursorSetImpl
 Type :: struct {
     kind: TypeKind,
     data: [2]rawptr,
 }
-TemplateArgumentKind :: enum u32 {Null = 0, Type = 1, Declaration = 2, NullPtr = 3, Integral = 4, Template = 5, TemplateExpansion = 6, Expression = 7, Pack = 8, Invalid = 9, }
-TypeNullabilityKind :: enum u32 {NonNull = 0, Nullable = 1, Unspecified = 2, Invalid = 3, NullableResult = 4, }
-TypeLayoutError :: enum i32 {Invalid = -1, Incomplete = -2, Dependent = -3, NotConstantSize = -4, InvalidFieldName = -5, Undeduced = -6, }
-RefQualifierKind :: enum u32 {None = 0, LValue = 1, RValue = 2, }
-CX_CXXAccessSpecifier :: enum u32 {InvalidAccessSpecifier = 0, Public = 1, Protected = 2, Private = 3, }
-CX_StorageClass :: enum u32 {Invalid = 0, None = 1, Extern = 2, Static = 3, PrivateExtern = 4, OpenCLWorkGroupLocal = 5, Auto = 6, Register = 7, }
-ChildVisitResult :: enum u32 {Break = 0, Continue = 1, Recurse = 2, }
+TypeLayoutError :: enum i32 {Invalid = -1, Incomplete = -2, Dependent = -3, NotConstantSize = -4, InvalidFieldName = -5, Undeduced = -6 }
 CursorVisitor :: #type proc "c" (cursor: Cursor, parent: Cursor, client_data: ClientData) -> ChildVisitResult
-CursorVisitorBlock :: rawptr
+_CXChildVisitResult :: rawptr
+CursorVisitorBlock :: ^_CXChildVisitResult
 PrintingPolicy :: rawptr
-PrintingPolicyProperty :: enum u32 {Indentation = 0, SuppressSpecifiers = 1, SuppressTagKeyword = 2, IncludeTagDefinition = 3, SuppressScope = 4, SuppressUnwrittenScope = 5, SuppressInitializers = 6, ConstantArraySizeAsWritten = 7, AnonymousTagLocations = 8, SuppressStrongLifetime = 9, SuppressLifetimeQualifiers = 10, SuppressTemplateArgsInCXXConstructors = 11, Bool = 12, Restrict = 13, Alignof = 14, UnderscoreAlignof = 15, UseVoidForZeroParams = 16, TerseOutput = 17, PolishForDeclaration = 18, Half = 19, MSWChar = 20, IncludeNewlines = 21, MSVCFormatting = 22, ConstantsAsWritten = 23, SuppressImplicitBase = 24, FullyQualifiedName = 25, LastProperty = 25, }
-ObjCPropertyAttrKind :: enum u32 {noattr = 0, readonly = 1, getter = 2, assign = 4, readwrite = 8, retain = 16, copy = 32, nonatomic = 64, setter = 128, atomic = 256, weak = 512, strong = 1024, unsafe_unretained = 2048, class = 4096, }
-ObjCDeclQualifierKind :: enum u32 {None = 0, In = 1, Inout = 2, Out = 4, Bycopy = 8, Byref = 16, Oneway = 32, }
 Module :: rawptr
-NameRefFlags :: enum u32 {WantQualifier = 1, WantTemplateArgs = 2, WantSinglePiece = 4, }
-TokenKind :: enum u32 {Punctuation = 0, Keyword = 1, Identifier = 2, Literal = 3, Comment = 4, }
 Token :: struct {
     int_data: [4]u32,
     ptr_data: rawptr,
@@ -117,28 +92,23 @@ Token :: struct {
 fn_func_ptr_anon_0 :: #type proc "c" (param0: rawptr)
 CompletionString :: rawptr
 CompletionResult :: struct {
-    CursorKind: CursorKind,
-    CompletionString: CompletionString,
+    CursorKind_m: CursorKind,
+    CompletionString_m: CompletionString,
 }
-CompletionChunkKind :: enum u32 {Optional = 0, TypedText = 1, Text = 2, Placeholder = 3, Informative = 4, CurrentParameter = 5, LeftParen = 6, RightParen = 7, LeftBracket = 8, RightBracket = 9, LeftBrace = 10, RightBrace = 11, LeftAngle = 12, RightAngle = 13, Comma = 14, ResultType = 15, Colon = 16, SemiColon = 17, Equal = 18, HorizontalSpace = 19, VerticalSpace = 20, }
 CodeCompleteResults :: struct {
     Results: [^]CompletionResult,
     NumResults: u32,
 }
-CodeComplete_Flags :: enum u32 {IncludeMacros = 1, IncludeCodePatterns = 2, IncludeBriefComments = 4, SkipPreamble = 8, IncludeCompletionsWithFixIts = 16, }
-CompletionContext :: enum u32 {Unexposed = 0, AnyType = 1, AnyValue = 2, ObjCObjectValue = 4, ObjCSelectorValue = 8, CXXClassTypeValue = 16, DotMemberAccess = 32, ArrowMemberAccess = 64, ObjCPropertyAccess = 128, EnumTag = 256, UnionTag = 512, StructTag = 1024, ClassTag = 2048, Namespace = 4096, NestedNameSpecifier = 8192, ObjCInterface = 16384, ObjCProtocol = 32768, ObjCCategory = 65536, ObjCInstanceMessage = 131072, ObjCClassMessage = 262144, ObjCSelectorName = 524288, MacroName = 1048576, NaturalLanguage = 2097152, IncludedFile = 4194304, Unknown = 8388607, }
 InclusionVisitor :: #type proc "c" (included_file: File, inclusion_stack: ^SourceLocation, include_len: u32, client_data: ClientData)
-EvalResultKind :: enum u32 {Int = 1, Float = 2, ObjCStrLiteral = 3, StrLiteral = 4, CFStr = 5, Other = 6, UnExposed = 0, }
 EvalResult :: rawptr
 Remapping :: rawptr
-VisitorResult :: enum u32 {Break = 0, Continue = 1, }
-visit_func_ptr_anon_1 :: #type proc "c" (context_: rawptr, param1: Cursor, param2: SourceRange) -> VisitorResult
+visit_func_ptr_anon_1 :: #type proc "c" (context_p: rawptr, param1: Cursor, param2: SourceRange) -> VisitorResult
 CursorAndRangeVisitor :: struct {
-    context_: rawptr,
+    context_m: rawptr,
     visit: visit_func_ptr_anon_1,
 }
-Result :: enum u32 {Success = 0, Invalid = 1, VisitBreak = 2, }
-CursorAndRangeVisitorBlock :: rawptr
+_CXCursorAndRangeVisitorBlock :: rawptr
+CursorAndRangeVisitorBlock :: ^_CXCursorAndRangeVisitorBlock
 IdxClientFile :: rawptr
 IdxClientEntity :: rawptr
 IdxClientContainer :: rawptr
@@ -161,10 +131,6 @@ IdxImportedASTFileInfo :: struct {
     loc: IdxLoc,
     isImplicit: i32,
 }
-IdxEntityKind :: enum u32 {Unexposed = 0, Typedef = 1, Function = 2, Variable = 3, Field = 4, EnumConstant = 5, ObjCClass = 6, ObjCProtocol = 7, ObjCCategory = 8, ObjCInstanceMethod = 9, ObjCClassMethod = 10, ObjCProperty = 11, ObjCIvar = 12, Enum = 13, Struct = 14, Union = 15, CXXClass = 16, CXXNamespace = 17, CXXNamespaceAlias = 18, CXXStaticVariable = 19, CXXStaticMethod = 20, CXXInstanceMethod = 21, CXXConstructor = 22, CXXDestructor = 23, CXXConversionFunction = 24, CXXTypeAlias = 25, CXXInterface = 26, CXXConcept = 27, }
-IdxEntityLanguage :: enum u32 {None = 0, C = 1, ObjC = 2, CXX = 3, Swift = 4, }
-IdxEntityCXXTemplateKind :: enum u32 {NonTemplate = 0, Template = 1, TemplatePartialSpecialization = 2, TemplateSpecialization = 3, }
-IdxAttrKind :: enum u32 {Unexposed = 0, IBAction = 1, IBOutlet = 2, IBOutletCollection = 3, }
 IdxAttrInfo :: struct {
     kind: IdxAttrKind,
     cursor: Cursor,
@@ -177,7 +143,7 @@ IdxEntityInfo :: struct {
     name: cstring,
     USR: cstring,
     cursor: Cursor,
-    attributes: ^[^]IdxAttrInfo,
+    attributes: [^]^IdxAttrInfo,
     numAttributes: u32,
 }
 IdxContainerInfo :: struct {
@@ -189,7 +155,6 @@ IdxIBOutletCollectionAttrInfo :: struct {
     classCursor: Cursor,
     classLoc: IdxLoc,
 }
-IdxDeclInfoFlags :: enum u32 {Skipped = 1, }
 IdxDeclInfo :: struct {
     entityInfo: ^IdxEntityInfo,
     cursor: Cursor,
@@ -201,11 +166,10 @@ IdxDeclInfo :: struct {
     isContainer: i32,
     declAsContainer: ^IdxContainerInfo,
     isImplicit: i32,
-    attributes: ^[^]IdxAttrInfo,
+    attributes: [^]^IdxAttrInfo,
     numAttributes: u32,
     flags: u32,
 }
-IdxObjCContainerKind :: enum u32 {ForwardRef = 0, Interface = 1, Implementation = 2, }
 IdxObjCContainerDeclInfo :: struct {
     declInfo: ^IdxDeclInfo,
     kind: IdxObjCContainerKind,
@@ -221,7 +185,7 @@ IdxObjCProtocolRefInfo :: struct {
     loc: IdxLoc,
 }
 IdxObjCProtocolRefListInfo :: struct {
-    protocols: ^[^]IdxObjCProtocolRefInfo,
+    protocols: [^]^IdxObjCProtocolRefInfo,
     numProtocols: u32,
 }
 IdxObjCInterfaceDeclInfo :: struct {
@@ -243,11 +207,9 @@ IdxObjCPropertyDeclInfo :: struct {
 }
 IdxCXXClassDeclInfo :: struct {
     declInfo: ^IdxDeclInfo,
-    bases: ^[^]IdxBaseClassInfo,
+    bases: [^]^IdxBaseClassInfo,
     numBases: u32,
 }
-IdxEntityRefKind :: enum u32 {Direct = 1, Implicit = 2, }
-SymbolRole :: enum u32 {None = 0, Declaration = 1, Definition = 2, Reference = 4, Read = 8, Write = 16, Call = 32, Dynamic = 64, AddressOf = 128, Implicit = 256, }
 IdxEntityRefInfo :: struct {
     kind: IdxEntityRefKind,
     cursor: Cursor,
@@ -276,10 +238,7 @@ IndexerCallbacks :: struct {
     indexEntityReference: indexEntityReference_func_ptr_anon_9,
 }
 IndexAction :: rawptr
-IndexOptFlags :: enum u32 {None = 0, SuppressRedundantRefs = 1, IndexFunctionLocalSymbols = 2, IndexImplicitTemplateInstantiations = 4, SuppressWarnings = 8, SkipParsedBodiesInSession = 16, }
 FieldVisitor :: #type proc "c" (C: Cursor, client_data: ClientData) -> VisitorResult
-BinaryOperatorKind :: enum u32 {Invalid = 0, PtrMemD = 1, PtrMemI = 2, Mul = 3, Div = 4, Rem = 5, Add = 6, Sub = 7, Shl = 8, Shr = 9, Cmp = 10, LT = 11, GT = 12, LE = 13, GE = 14, EQ = 15, NE = 16, And = 17, Xor = 18, Or = 19, LAnd = 20, LOr = 21, Assign = 22, MulAssign = 23, DivAssign = 24, RemAssign = 25, AddAssign = 26, SubAssign = 27, ShlAssign = 28, ShrAssign = 29, AndAssign = 30, XorAssign = 31, OrAssign = 32, Comma = 33, }
-UnaryOperatorKind :: enum u32 {Invalid = 0, PostInc = 1, PostDec = 2, PreInc = 3, PreDec = 4, AddrOf = 5, Deref = 6, Plus = 7, Minus = 8, Not = 9, LNot = 10, Real = 11, Imag = 12, Extension = 13, Coawait = 14, }
 Rewriter :: rawptr
 
 @(default_calling_convention = "c")
@@ -321,7 +280,7 @@ foreign clang_runic {
     ModuleMapDescriptor_dispose :: proc(param0: ModuleMapDescriptor) ---
 
     @(link_name = "clang_CompilationDatabase_fromDirectory")
-    CompilationDatabase_fromDirectory :: proc(BuildDir: cstring, ErrorCode: ^CompilationDatabase_Error) -> CompilationDatabase ---
+    CompilationDatabase_fromDirectory :: proc(BuildDir: cstring, ErrorCode_p: ^CompilationDatabase_Error) -> CompilationDatabase ---
 
     @(link_name = "clang_CompilationDatabase_dispose")
     CompilationDatabase_dispose :: proc(param0: CompilationDatabase) ---
@@ -366,7 +325,7 @@ foreign clang_runic {
     getNumDiagnosticsInSet :: proc(Diags: DiagnosticSet) -> u32 ---
 
     @(link_name = "clang_getDiagnosticInSet")
-    getDiagnosticInSet :: proc(Diags: DiagnosticSet, Index: u32) -> Diagnostic ---
+    getDiagnosticInSet :: proc(Diags: DiagnosticSet, Index_p: u32) -> Diagnostic ---
 
     @(link_name = "clang_loadDiagnostics")
     loadDiagnostics :: proc(file: cstring, error: ^LoadDiag_Error, errorString: ^String) -> DiagnosticSet ---
@@ -378,10 +337,10 @@ foreign clang_runic {
     getChildDiagnostics :: proc(D: Diagnostic) -> DiagnosticSet ---
 
     @(link_name = "clang_disposeDiagnostic")
-    disposeDiagnostic :: proc(Diagnostic: Diagnostic) ---
+    disposeDiagnostic :: proc(Diagnostic_p: Diagnostic) ---
 
     @(link_name = "clang_formatDiagnostic")
-    formatDiagnostic :: proc(Diagnostic: Diagnostic, Options: DiagnosticDisplayOptions) -> String ---
+    formatDiagnostic :: proc(Diagnostic_p: Diagnostic, Options: DiagnosticDisplayOptions) -> String ---
 
     @(link_name = "clang_defaultDiagnosticDisplayOptions")
     defaultDiagnosticDisplayOptions :: proc() -> DiagnosticDisplayOptions ---
@@ -411,19 +370,19 @@ foreign clang_runic {
     getDiagnosticNumRanges :: proc(param0: Diagnostic) -> u32 ---
 
     @(link_name = "clang_getDiagnosticRange")
-    getDiagnosticRange :: proc(Diagnostic: Diagnostic, Range: u32) -> SourceRange ---
+    getDiagnosticRange :: proc(Diagnostic_p: Diagnostic, Range: u32) -> SourceRange ---
 
     @(link_name = "clang_getDiagnosticNumFixIts")
-    getDiagnosticNumFixIts :: proc(Diagnostic: Diagnostic) -> u32 ---
+    getDiagnosticNumFixIts :: proc(Diagnostic_p: Diagnostic) -> u32 ---
 
     @(link_name = "clang_getDiagnosticFixIt")
-    getDiagnosticFixIt :: proc(Diagnostic: Diagnostic, FixIt: u32, ReplacementRange: ^SourceRange) -> String ---
+    getDiagnosticFixIt :: proc(Diagnostic_p: Diagnostic, FixIt: u32, ReplacementRange: ^SourceRange) -> String ---
 
     @(link_name = "clang_getFileName")
     getFileName :: proc(SFile: File) -> String ---
 
     @(link_name = "clang_getFileTime")
-    getFileTime :: proc(SFile: File) -> time_t ---
+    getFileTime :: proc(SFile: File) -> libc.time_t ---
 
     @(link_name = "clang_getFileUniqueID")
     getFileUniqueID :: proc(file: File, outID: ^FileUniqueID) -> b32 ---
@@ -483,10 +442,10 @@ foreign clang_runic {
     disposeSourceRangeList :: proc(ranges: [^]SourceRangeList) ---
 
     @(link_name = "clang_getCString")
-    getCString :: proc(string_: String) -> cstring ---
+    getCString :: proc(string_p: String) -> cstring ---
 
     @(link_name = "clang_disposeString")
-    disposeString :: proc(string_: String) ---
+    disposeString :: proc(string_p: String) ---
 
     @(link_name = "clang_disposeStringSet")
     disposeStringSet :: proc(set: ^StringSet) ---
@@ -495,103 +454,103 @@ foreign clang_runic {
     Cursor_getParsedComment :: proc(C: Cursor) -> Comment ---
 
     @(link_name = "clang_Comment_getKind")
-    Comment_getKind :: proc(comment: Comment) -> CommentKind ---
+    Comment_getKind :: proc(Comment_p: Comment) -> CommentKind ---
 
     @(link_name = "clang_Comment_getNumChildren")
-    Comment_getNumChildren :: proc(comment: Comment) -> u32 ---
+    Comment_getNumChildren :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_Comment_getChild")
-    Comment_getChild :: proc(comment: Comment, ChildIdx: u32) -> Comment ---
+    Comment_getChild :: proc(Comment_p: Comment, ChildIdx: u32) -> Comment ---
 
     @(link_name = "clang_Comment_isWhitespace")
-    Comment_isWhitespace :: proc(comment: Comment) -> b32 ---
+    Comment_isWhitespace :: proc(Comment_p: Comment) -> b32 ---
 
     @(link_name = "clang_InlineContentComment_hasTrailingNewline")
-    InlineContentComment_hasTrailingNewline :: proc(comment: Comment) -> u32 ---
+    InlineContentComment_hasTrailingNewline :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_TextComment_getText")
-    TextComment_getText :: proc(comment: Comment) -> String ---
+    TextComment_getText :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_InlineCommandComment_getCommandName")
-    InlineCommandComment_getCommandName :: proc(comment: Comment) -> String ---
+    InlineCommandComment_getCommandName :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_InlineCommandComment_getRenderKind")
-    InlineCommandComment_getRenderKind :: proc(comment: Comment) -> CommentInlineCommandRenderKind ---
+    InlineCommandComment_getRenderKind :: proc(Comment_p: Comment) -> CommentInlineCommandRenderKind ---
 
     @(link_name = "clang_InlineCommandComment_getNumArgs")
-    InlineCommandComment_getNumArgs :: proc(comment: Comment) -> u32 ---
+    InlineCommandComment_getNumArgs :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_InlineCommandComment_getArgText")
-    InlineCommandComment_getArgText :: proc(comment: Comment, ArgIdx: u32) -> String ---
+    InlineCommandComment_getArgText :: proc(Comment_p: Comment, ArgIdx: u32) -> String ---
 
     @(link_name = "clang_HTMLTagComment_getTagName")
-    HTMLTagComment_getTagName :: proc(comment: Comment) -> String ---
+    HTMLTagComment_getTagName :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_HTMLStartTagComment_isSelfClosing")
-    HTMLStartTagComment_isSelfClosing :: proc(comment: Comment) -> b32 ---
+    HTMLStartTagComment_isSelfClosing :: proc(Comment_p: Comment) -> b32 ---
 
     @(link_name = "clang_HTMLStartTag_getNumAttrs")
-    HTMLStartTag_getNumAttrs :: proc(comment: Comment) -> u32 ---
+    HTMLStartTag_getNumAttrs :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_HTMLStartTag_getAttrName")
-    HTMLStartTag_getAttrName :: proc(comment: Comment, AttrIdx: u32) -> String ---
+    HTMLStartTag_getAttrName :: proc(Comment_p: Comment, AttrIdx: u32) -> String ---
 
     @(link_name = "clang_HTMLStartTag_getAttrValue")
-    HTMLStartTag_getAttrValue :: proc(comment: Comment, AttrIdx: u32) -> String ---
+    HTMLStartTag_getAttrValue :: proc(Comment_p: Comment, AttrIdx: u32) -> String ---
 
     @(link_name = "clang_BlockCommandComment_getCommandName")
-    BlockCommandComment_getCommandName :: proc(comment: Comment) -> String ---
+    BlockCommandComment_getCommandName :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_BlockCommandComment_getNumArgs")
-    BlockCommandComment_getNumArgs :: proc(comment: Comment) -> u32 ---
+    BlockCommandComment_getNumArgs :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_BlockCommandComment_getArgText")
-    BlockCommandComment_getArgText :: proc(comment: Comment, ArgIdx: u32) -> String ---
+    BlockCommandComment_getArgText :: proc(Comment_p: Comment, ArgIdx: u32) -> String ---
 
     @(link_name = "clang_BlockCommandComment_getParagraph")
-    BlockCommandComment_getParagraph :: proc(comment: Comment) -> Comment ---
+    BlockCommandComment_getParagraph :: proc(Comment_p: Comment) -> Comment ---
 
     @(link_name = "clang_ParamCommandComment_getParamName")
-    ParamCommandComment_getParamName :: proc(comment: Comment) -> String ---
+    ParamCommandComment_getParamName :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_ParamCommandComment_isParamIndexValid")
-    ParamCommandComment_isParamIndexValid :: proc(comment: Comment) -> b32 ---
+    ParamCommandComment_isParamIndexValid :: proc(Comment_p: Comment) -> b32 ---
 
     @(link_name = "clang_ParamCommandComment_getParamIndex")
-    ParamCommandComment_getParamIndex :: proc(comment: Comment) -> u32 ---
+    ParamCommandComment_getParamIndex :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_ParamCommandComment_isDirectionExplicit")
-    ParamCommandComment_isDirectionExplicit :: proc(comment: Comment) -> b32 ---
+    ParamCommandComment_isDirectionExplicit :: proc(Comment_p: Comment) -> b32 ---
 
     @(link_name = "clang_ParamCommandComment_getDirection")
-    ParamCommandComment_getDirection :: proc(comment: Comment) -> CommentParamPassDirection ---
+    ParamCommandComment_getDirection :: proc(Comment_p: Comment) -> CommentParamPassDirection ---
 
     @(link_name = "clang_TParamCommandComment_getParamName")
-    TParamCommandComment_getParamName :: proc(comment: Comment) -> String ---
+    TParamCommandComment_getParamName :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_TParamCommandComment_isParamPositionValid")
-    TParamCommandComment_isParamPositionValid :: proc(comment: Comment) -> b32 ---
+    TParamCommandComment_isParamPositionValid :: proc(Comment_p: Comment) -> b32 ---
 
     @(link_name = "clang_TParamCommandComment_getDepth")
-    TParamCommandComment_getDepth :: proc(comment: Comment) -> u32 ---
+    TParamCommandComment_getDepth :: proc(Comment_p: Comment) -> u32 ---
 
     @(link_name = "clang_TParamCommandComment_getIndex")
-    TParamCommandComment_getIndex :: proc(comment: Comment, Depth: u32) -> u32 ---
+    TParamCommandComment_getIndex :: proc(Comment_p: Comment, Depth: u32) -> u32 ---
 
     @(link_name = "clang_VerbatimBlockLineComment_getText")
-    VerbatimBlockLineComment_getText :: proc(comment: Comment) -> String ---
+    VerbatimBlockLineComment_getText :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_VerbatimLineComment_getText")
-    VerbatimLineComment_getText :: proc(comment: Comment) -> String ---
+    VerbatimLineComment_getText :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_HTMLTagComment_getAsString")
-    HTMLTagComment_getAsString :: proc(comment: Comment) -> String ---
+    HTMLTagComment_getAsString :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_FullComment_getAsHTML")
-    FullComment_getAsHTML :: proc(comment: Comment) -> String ---
+    FullComment_getAsHTML :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_FullComment_getAsXML")
-    FullComment_getAsXML :: proc(comment: Comment) -> String ---
+    FullComment_getAsXML :: proc(Comment_p: Comment) -> String ---
 
     @(link_name = "clang_createAPISet")
     createAPISet :: proc(tu: TranslationUnit, out_api: ^APISet) -> ErrorCode ---
@@ -618,7 +577,7 @@ foreign clang_runic {
     disposeIndex :: proc(index: Index) ---
 
     @(link_name = "clang_createIndexWithOptions")
-    createIndexWithOptions :: proc(options: rawptr) -> Index ---
+    createIndexWithOptions :: proc(options: [^]IndexOptions) -> Index ---
 
     @(link_name = "clang_CXIndex_setGlobalOptions")
     Index_setGlobalOptions :: proc(param0: Index, options: u32) ---
@@ -654,7 +613,7 @@ foreign clang_runic {
     getNumDiagnostics :: proc(Unit: TranslationUnit) -> u32 ---
 
     @(link_name = "clang_getDiagnostic")
-    getDiagnostic :: proc(Unit: TranslationUnit, Index: u32) -> Diagnostic ---
+    getDiagnostic :: proc(Unit: TranslationUnit, Index_p: u32) -> Diagnostic ---
 
     @(link_name = "clang_getDiagnosticSetFromTU")
     getDiagnosticSetFromTU :: proc(Unit: TranslationUnit) -> DiagnosticSet ---
@@ -1044,10 +1003,16 @@ foreign clang_runic {
     isVirtualBase :: proc(param0: Cursor) -> b32 ---
 
     @(link_name = "clang_getCXXAccessSpecifier")
-    getCXXAccessSpecifier :: proc(param0: Cursor) -> CX_CXXAccessSpecifier ---
+    getCXXAccessSpecifier :: proc(param0: Cursor) -> _CXXAccessSpecifier ---
+
+    @(link_name = "clang_Cursor_getBinaryOpcode")
+    Cursor_getBinaryOpcode :: proc(C: Cursor) -> _BinaryOperatorKind ---
+
+    @(link_name = "clang_Cursor_getBinaryOpcodeStr")
+    Cursor_getBinaryOpcodeStr :: proc(Op: _BinaryOperatorKind) -> String ---
 
     @(link_name = "clang_Cursor_getStorageClass")
-    Cursor_getStorageClass :: proc(param0: Cursor) -> CX_StorageClass ---
+    Cursor_getStorageClass :: proc(param0: Cursor) -> _StorageClass ---
 
     @(link_name = "clang_getNumOverloadedDecls")
     getNumOverloadedDecls :: proc(cursor: Cursor) -> u32 ---
@@ -1060,9 +1025,6 @@ foreign clang_runic {
 
     @(link_name = "clang_visitChildren")
     visitChildren :: proc(parent: Cursor, visitor: CursorVisitor, client_data: ClientData) -> b32 ---
-
-    @(link_name = "clang_visitChildrenWithBlock")
-    visitChildrenWithBlock :: proc(parent: Cursor, block: CursorVisitorBlock) -> b32 ---
 
     @(link_name = "clang_getCursorUSR")
     getCursorUSR :: proc(param0: Cursor) -> String ---
@@ -1104,7 +1066,7 @@ foreign clang_runic {
     PrintingPolicy_dispose :: proc(Policy: PrintingPolicy) ---
 
     @(link_name = "clang_getCursorPrettyPrinted")
-    getCursorPrettyPrinted :: proc(Cursor: Cursor, Policy: PrintingPolicy) -> String ---
+    getCursorPrettyPrinted :: proc(Cursor_p: Cursor, Policy: PrintingPolicy) -> String ---
 
     @(link_name = "clang_getCursorDisplayName")
     getCursorDisplayName :: proc(param0: Cursor) -> String ---
@@ -1176,25 +1138,25 @@ foreign clang_runic {
     getModuleForFile :: proc(param0: TranslationUnit, param1: File) -> Module ---
 
     @(link_name = "clang_Module_getASTFile")
-    Module_getASTFile :: proc(module: Module) -> File ---
+    Module_getASTFile :: proc(Module_p: Module) -> File ---
 
     @(link_name = "clang_Module_getParent")
-    Module_getParent :: proc(module: Module) -> Module ---
+    Module_getParent :: proc(Module_p: Module) -> Module ---
 
     @(link_name = "clang_Module_getName")
-    Module_getName :: proc(module: Module) -> String ---
+    Module_getName :: proc(Module_p: Module) -> String ---
 
     @(link_name = "clang_Module_getFullName")
-    Module_getFullName :: proc(module: Module) -> String ---
+    Module_getFullName :: proc(Module_p: Module) -> String ---
 
     @(link_name = "clang_Module_isSystem")
-    Module_isSystem :: proc(module: Module) -> b32 ---
+    Module_isSystem :: proc(Module_p: Module) -> b32 ---
 
     @(link_name = "clang_Module_getNumTopLevelHeaders")
-    Module_getNumTopLevelHeaders :: proc(param0: TranslationUnit, module: Module) -> u32 ---
+    Module_getNumTopLevelHeaders :: proc(param0: TranslationUnit, Module_p: Module) -> u32 ---
 
     @(link_name = "clang_Module_getTopLevelHeader")
-    Module_getTopLevelHeader :: proc(param0: TranslationUnit, module: Module, Index: u32) -> File ---
+    Module_getTopLevelHeader :: proc(param0: TranslationUnit, Module_p: Module, Index_p: u32) -> File ---
 
     @(link_name = "clang_CXXConstructor_isConvertingConstructor")
     Constructor_isConvertingConstructor :: proc(C: Cursor) -> b32 ---
@@ -1344,7 +1306,7 @@ foreign clang_runic {
     codeCompleteGetNumDiagnostics :: proc(Results: [^]CodeCompleteResults) -> u32 ---
 
     @(link_name = "clang_codeCompleteGetDiagnostic")
-    codeCompleteGetDiagnostic :: proc(Results: [^]CodeCompleteResults, Index: u32) -> Diagnostic ---
+    codeCompleteGetDiagnostic :: proc(Results: [^]CodeCompleteResults, Index_p: u32) -> Diagnostic ---
 
     @(link_name = "clang_codeCompleteGetContexts")
     codeCompleteGetContexts :: proc(Results: [^]CodeCompleteResults) -> u64 ---
@@ -1414,12 +1376,6 @@ foreign clang_runic {
 
     @(link_name = "clang_findIncludesInFile")
     findIncludesInFile :: proc(TU: TranslationUnit, file: File, visitor: CursorAndRangeVisitor) -> Result ---
-
-    @(link_name = "clang_findReferencesInFileWithBlock")
-    findReferencesInFileWithBlock :: proc(param0: Cursor, param1: File, param2: CursorAndRangeVisitorBlock) -> Result ---
-
-    @(link_name = "clang_findIncludesInFileWithBlock")
-    findIncludesInFileWithBlock :: proc(param0: TranslationUnit, param1: File, param2: CursorAndRangeVisitorBlock) -> Result ---
 
     @(link_name = "clang_index_isEntityObjCContainerKind")
     index_isEntityObjCContainerKind :: proc(param0: IdxEntityKind) -> b32 ---
@@ -1518,41 +1474,153 @@ foreign clang_runic {
 
 when (ODIN_OS == .Windows) {
 
+CompilationDatabase_Error :: enum i32 {NoError = 0, CanNotLoadDatabase = 1 }
+DiagnosticSeverity :: enum i32 {Ignored = 0, Note = 1, Warning = 2, Error = 3, Fatal = 4 }
+LoadDiag_Error :: enum i32 {None = 0, Unknown = 1, CannotLoad = 2, InvalidFile = 3 }
+DiagnosticDisplayOptions :: enum i32 {DisplaySourceLocation = 1, DisplayColumn = 2, DisplaySourceRanges = 4, DisplayOption = 8, DisplayCategoryId = 16, DisplayCategoryName = 32 }
+ErrorCode :: enum i32 {Success = 0, Failure = 1, Crashed = 2, InvalidArguments = 3, ASTReadError = 4 }
+CommentKind :: enum i32 {Null = 0, Text = 1, InlineCommand = 2, HTMLStartTag = 3, HTMLEndTag = 4, Paragraph = 5, BlockCommand = 6, ParamCommand = 7, TParamCommand = 8, VerbatimBlockCommand = 9, VerbatimBlockLine = 10, VerbatimLine = 11, FullComment = 12 }
+CommentInlineCommandRenderKind :: enum i32 {Normal = 0, Bold = 1, Monospaced = 2, Emphasized = 3, Anchor = 4 }
+CommentParamPassDirection :: enum i32 {In = 0, Out = 1, InOut = 2 }
 UnsavedFile :: struct {
     Filename: cstring,
     Contents: cstring,
     Length: u32,
 }
+AvailabilityKind :: enum i32 {Available = 0, Deprecated = 1, NotAvailable = 2, NotAccessible = 3 }
+Cursor_ExceptionSpecificationKind :: enum i32 {None = 0, DynamicNone = 1, Dynamic = 2, MSAny = 3, BasicNoexcept = 4, ComputedNoexcept = 5, Unevaluated = 6, Uninstantiated = 7, Unparsed = 8, NoThrow = 9 }
+Choice :: enum i32 {Default = 0, Enabled = 1, Disabled = 2 }
+GlobalOptFlags :: enum i32 {None = 0, ThreadBackgroundPriorityForIndexing = 1, ThreadBackgroundPriorityForEditing = 2, ThreadBackgroundPriorityForAll = 3 }
+TranslationUnit_Flags :: enum i32 {None = 0, DetailedPreprocessingRecord = 1, Incomplete = 2, PrecompiledPreamble = 4, CacheCompletionResults = 8, ForSerialization = 16, CXXChainedPCH = 32, SkipFunctionBodies = 64, IncludeBriefCommentsInCodeCompletion = 128, CreatePreambleOnFirstParse = 256, KeepGoing = 512, SingleFileParse = 1024, LimitSkipFunctionBodiesToPreamble = 2048, IncludeAttributedTypes = 4096, VisitImplicitAttributes = 8192, IgnoreNonErrorsFromIncludedFiles = 16384, RetainExcludedConditionalBlocks = 32768 }
+SaveTranslationUnit_Flags :: enum i32 {None = 0 }
+SaveError :: enum i32 {None = 0, Unknown = 1, TranslationErrors = 2, InvalidTU = 3 }
+Reparse_Flags :: enum i32 {None = 0 }
+TUResourceUsageKind :: enum i32 {AST = 1, Identifiers = 2, Selectors = 3, GlobalCompletionResults = 4, SourceManagerContentCache = 5, AST_SideTables = 6, SourceManager_Membuffer_Malloc = 7, SourceManager_Membuffer_MMap = 8, ExternalASTSource_Membuffer_Malloc = 9, ExternalASTSource_Membuffer_MMap = 10, Preprocessor = 11, PreprocessingRecord = 12, SourceManager_DataStructures = 13, Preprocessor_HeaderSearch = 14, MEMORY_IN_BYTES_BEGIN = 1, MEMORY_IN_BYTES_END = 14, First = 1, Last = 14 }
 TUResourceUsageEntry :: struct {
     kind: TUResourceUsageKind,
     amount: u32,
 }
-time_t :: i32
+CursorKind :: enum i32 {UnexposedDecl = 1, StructDecl = 2, UnionDecl = 3, ClassDecl = 4, EnumDecl = 5, FieldDecl = 6, EnumConstantDecl = 7, FunctionDecl = 8, VarDecl = 9, ParmDecl = 10, ObjCInterfaceDecl = 11, ObjCCategoryDecl = 12, ObjCProtocolDecl = 13, ObjCPropertyDecl = 14, ObjCIvarDecl = 15, ObjCInstanceMethodDecl = 16, ObjCClassMethodDecl = 17, ObjCImplementationDecl = 18, ObjCCategoryImplDecl = 19, TypedefDecl = 20, CXXMethod = 21, Namespace = 22, LinkageSpec = 23, Constructor = 24, Destructor = 25, ConversionFunction = 26, TemplateTypeParameter = 27, NonTypeTemplateParameter = 28, TemplateTemplateParameter = 29, FunctionTemplate = 30, ClassTemplate = 31, ClassTemplatePartialSpecialization = 32, NamespaceAlias = 33, UsingDirective = 34, UsingDeclaration = 35, TypeAliasDecl = 36, ObjCSynthesizeDecl = 37, ObjCDynamicDecl = 38, CXXAccessSpecifier = 39, FirstDecl = 1, LastDecl = 39, FirstRef = 40, ObjCSuperClassRef = 40, ObjCProtocolRef = 41, ObjCClassRef = 42, TypeRef = 43, CXXBaseSpecifier = 44, TemplateRef = 45, NamespaceRef = 46, MemberRef = 47, LabelRef = 48, OverloadedDeclRef = 49, VariableRef = 50, LastRef = 50, FirstInvalid = 70, InvalidFile = 70, NoDeclFound = 71, NotImplemented = 72, InvalidCode = 73, LastInvalid = 73, FirstExpr = 100, UnexposedExpr = 100, DeclRefExpr = 101, MemberRefExpr = 102, CallExpr = 103, ObjCMessageExpr = 104, BlockExpr = 105, IntegerLiteral = 106, FloatingLiteral = 107, ImaginaryLiteral = 108, StringLiteral = 109, CharacterLiteral = 110, ParenExpr = 111, UnaryOperator = 112, ArraySubscriptExpr = 113, BinaryOperator = 114, CompoundAssignOperator = 115, ConditionalOperator = 116, CStyleCastExpr = 117, CompoundLiteralExpr = 118, InitListExpr = 119, AddrLabelExpr = 120, StmtExpr = 121, GenericSelectionExpr = 122, GNUNullExpr = 123, CXXStaticCastExpr = 124, CXXDynamicCastExpr = 125, CXXReinterpretCastExpr = 126, CXXConstCastExpr = 127, CXXFunctionalCastExpr = 128, CXXTypeidExpr = 129, CXXBoolLiteralExpr = 130, CXXNullPtrLiteralExpr = 131, CXXThisExpr = 132, CXXThrowExpr = 133, CXXNewExpr = 134, CXXDeleteExpr = 135, UnaryExpr = 136, ObjCStringLiteral = 137, ObjCEncodeExpr = 138, ObjCSelectorExpr = 139, ObjCProtocolExpr = 140, ObjCBridgedCastExpr = 141, PackExpansionExpr = 142, SizeOfPackExpr = 143, LambdaExpr = 144, ObjCBoolLiteralExpr = 145, ObjCSelfExpr = 146, ArraySectionExpr = 147, ObjCAvailabilityCheckExpr = 148, FixedPointLiteral = 149, OMPArrayShapingExpr = 150, OMPIteratorExpr = 151, CXXAddrspaceCastExpr = 152, ConceptSpecializationExpr = 153, RequiresExpr = 154, CXXParenListInitExpr = 155, PackIndexingExpr = 156, LastExpr = 156, FirstStmt = 200, UnexposedStmt = 200, LabelStmt = 201, CompoundStmt = 202, CaseStmt = 203, DefaultStmt = 204, IfStmt = 205, SwitchStmt = 206, WhileStmt = 207, DoStmt = 208, ForStmt = 209, GotoStmt = 210, IndirectGotoStmt = 211, ContinueStmt = 212, BreakStmt = 213, ReturnStmt = 214, GCCAsmStmt = 215, AsmStmt = 215, ObjCAtTryStmt = 216, ObjCAtCatchStmt = 217, ObjCAtFinallyStmt = 218, ObjCAtThrowStmt = 219, ObjCAtSynchronizedStmt = 220, ObjCAutoreleasePoolStmt = 221, ObjCForCollectionStmt = 222, CXXCatchStmt = 223, CXXTryStmt = 224, CXXForRangeStmt = 225, SEHTryStmt = 226, SEHExceptStmt = 227, SEHFinallyStmt = 228, MSAsmStmt = 229, NullStmt = 230, DeclStmt = 231, OMPParallelDirective = 232, OMPSimdDirective = 233, OMPForDirective = 234, OMPSectionsDirective = 235, OMPSectionDirective = 236, OMPSingleDirective = 237, OMPParallelForDirective = 238, OMPParallelSectionsDirective = 239, OMPTaskDirective = 240, OMPMasterDirective = 241, OMPCriticalDirective = 242, OMPTaskyieldDirective = 243, OMPBarrierDirective = 244, OMPTaskwaitDirective = 245, OMPFlushDirective = 246, SEHLeaveStmt = 247, OMPOrderedDirective = 248, OMPAtomicDirective = 249, OMPForSimdDirective = 250, OMPParallelForSimdDirective = 251, OMPTargetDirective = 252, OMPTeamsDirective = 253, OMPTaskgroupDirective = 254, OMPCancellationPointDirective = 255, OMPCancelDirective = 256, OMPTargetDataDirective = 257, OMPTaskLoopDirective = 258, OMPTaskLoopSimdDirective = 259, OMPDistributeDirective = 260, OMPTargetEnterDataDirective = 261, OMPTargetExitDataDirective = 262, OMPTargetParallelDirective = 263, OMPTargetParallelForDirective = 264, OMPTargetUpdateDirective = 265, OMPDistributeParallelForDirective = 266, OMPDistributeParallelForSimdDirective = 267, OMPDistributeSimdDirective = 268, OMPTargetParallelForSimdDirective = 269, OMPTargetSimdDirective = 270, OMPTeamsDistributeDirective = 271, OMPTeamsDistributeSimdDirective = 272, OMPTeamsDistributeParallelForSimdDirective = 273, OMPTeamsDistributeParallelForDirective = 274, OMPTargetTeamsDirective = 275, OMPTargetTeamsDistributeDirective = 276, OMPTargetTeamsDistributeParallelForDirective = 277, OMPTargetTeamsDistributeParallelForSimdDirective = 278, OMPTargetTeamsDistributeSimdDirective = 279, BuiltinBitCastExpr = 280, OMPMasterTaskLoopDirective = 281, OMPParallelMasterTaskLoopDirective = 282, OMPMasterTaskLoopSimdDirective = 283, OMPParallelMasterTaskLoopSimdDirective = 284, OMPParallelMasterDirective = 285, OMPDepobjDirective = 286, OMPScanDirective = 287, OMPTileDirective = 288, OMPCanonicalLoop = 289, OMPInteropDirective = 290, OMPDispatchDirective = 291, OMPMaskedDirective = 292, OMPUnrollDirective = 293, OMPMetaDirective = 294, OMPGenericLoopDirective = 295, OMPTeamsGenericLoopDirective = 296, OMPTargetTeamsGenericLoopDirective = 297, OMPParallelGenericLoopDirective = 298, OMPTargetParallelGenericLoopDirective = 299, OMPParallelMaskedDirective = 300, OMPMaskedTaskLoopDirective = 301, OMPMaskedTaskLoopSimdDirective = 302, OMPParallelMaskedTaskLoopDirective = 303, OMPParallelMaskedTaskLoopSimdDirective = 304, OMPErrorDirective = 305, OMPScopeDirective = 306, OMPReverseDirective = 307, OMPInterchangeDirective = 308, OpenACCComputeConstruct = 320, OpenACCLoopConstruct = 321, LastStmt = 321, TranslationUnit = 350, FirstAttr = 400, UnexposedAttr = 400, IBActionAttr = 401, IBOutletAttr = 402, IBOutletCollectionAttr = 403, CXXFinalAttr = 404, CXXOverrideAttr = 405, AnnotateAttr = 406, AsmLabelAttr = 407, PackedAttr = 408, PureAttr = 409, ConstAttr = 410, NoDuplicateAttr = 411, CUDAConstantAttr = 412, CUDADeviceAttr = 413, CUDAGlobalAttr = 414, CUDAHostAttr = 415, CUDASharedAttr = 416, VisibilityAttr = 417, DLLExport = 418, DLLImport = 419, NSReturnsRetained = 420, NSReturnsNotRetained = 421, NSReturnsAutoreleased = 422, NSConsumesSelf = 423, NSConsumed = 424, ObjCException = 425, ObjCNSObject = 426, ObjCIndependentClass = 427, ObjCPreciseLifetime = 428, ObjCReturnsInnerPointer = 429, ObjCRequiresSuper = 430, ObjCRootClass = 431, ObjCSubclassingRestricted = 432, ObjCExplicitProtocolImpl = 433, ObjCDesignatedInitializer = 434, ObjCRuntimeVisible = 435, ObjCBoxable = 436, FlagEnum = 437, ConvergentAttr = 438, WarnUnusedAttr = 439, WarnUnusedResultAttr = 440, AlignedAttr = 441, LastAttr = 441, PreprocessingDirective = 500, MacroDefinition = 501, MacroExpansion = 502, MacroInstantiation = 502, InclusionDirective = 503, FirstPreprocessing = 500, LastPreprocessing = 503, ModuleImportDecl = 600, TypeAliasTemplateDecl = 601, StaticAssert = 602, FriendDecl = 603, ConceptDecl = 604, FirstExtraDecl = 600, LastExtraDecl = 604, OverloadCandidate = 700 }
+LinkageKind :: enum i32 {Invalid = 0, NoLinkage = 1, Internal = 2, UniqueExternal = 3, External = 4 }
+VisibilityKind :: enum i32 {Invalid = 0, Hidden = 1, Protected = 2, Default = 3 }
+LanguageKind :: enum i32 {Invalid = 0, C = 1, ObjC = 2, CPlusPlus = 3 }
+TLSKind :: enum i32 {None = 0, Dynamic = 1, Static = 2 }
+TypeKind :: enum i32 {Invalid = 0, Unexposed = 1, Void = 2, Bool = 3, Char_U = 4, UChar = 5, Char16 = 6, Char32 = 7, UShort = 8, UInt = 9, ULong = 10, ULongLong = 11, UInt128 = 12, Char_S = 13, SChar = 14, WChar = 15, Short = 16, Int = 17, Long = 18, LongLong = 19, Int128 = 20, Float = 21, Double = 22, LongDouble = 23, NullPtr = 24, Overload = 25, Dependent = 26, ObjCId = 27, ObjCClass = 28, ObjCSel = 29, Float128 = 30, Half = 31, Float16 = 32, ShortAccum = 33, Accum = 34, LongAccum = 35, UShortAccum = 36, UAccum = 37, ULongAccum = 38, BFloat16 = 39, Ibm128 = 40, FirstBuiltin = 2, LastBuiltin = 40, Complex = 100, Pointer = 101, BlockPointer = 102, LValueReference = 103, RValueReference = 104, Record = 105, Enum = 106, Typedef = 107, ObjCInterface = 108, ObjCObjectPointer = 109, FunctionNoProto = 110, FunctionProto = 111, ConstantArray = 112, Vector = 113, IncompleteArray = 114, VariableArray = 115, DependentSizedArray = 116, MemberPointer = 117, Auto = 118, Elaborated = 119, Pipe = 120, OCLImage1dRO = 121, OCLImage1dArrayRO = 122, OCLImage1dBufferRO = 123, OCLImage2dRO = 124, OCLImage2dArrayRO = 125, OCLImage2dDepthRO = 126, OCLImage2dArrayDepthRO = 127, OCLImage2dMSAARO = 128, OCLImage2dArrayMSAARO = 129, OCLImage2dMSAADepthRO = 130, OCLImage2dArrayMSAADepthRO = 131, OCLImage3dRO = 132, OCLImage1dWO = 133, OCLImage1dArrayWO = 134, OCLImage1dBufferWO = 135, OCLImage2dWO = 136, OCLImage2dArrayWO = 137, OCLImage2dDepthWO = 138, OCLImage2dArrayDepthWO = 139, OCLImage2dMSAAWO = 140, OCLImage2dArrayMSAAWO = 141, OCLImage2dMSAADepthWO = 142, OCLImage2dArrayMSAADepthWO = 143, OCLImage3dWO = 144, OCLImage1dRW = 145, OCLImage1dArrayRW = 146, OCLImage1dBufferRW = 147, OCLImage2dRW = 148, OCLImage2dArrayRW = 149, OCLImage2dDepthRW = 150, OCLImage2dArrayDepthRW = 151, OCLImage2dMSAARW = 152, OCLImage2dArrayMSAARW = 153, OCLImage2dMSAADepthRW = 154, OCLImage2dArrayMSAADepthRW = 155, OCLImage3dRW = 156, OCLSampler = 157, OCLEvent = 158, OCLQueue = 159, OCLReserveID = 160, ObjCObject = 161, ObjCTypeParam = 162, Attributed = 163, OCLIntelSubgroupAVCMcePayload = 164, OCLIntelSubgroupAVCImePayload = 165, OCLIntelSubgroupAVCRefPayload = 166, OCLIntelSubgroupAVCSicPayload = 167, OCLIntelSubgroupAVCMceResult = 168, OCLIntelSubgroupAVCImeResult = 169, OCLIntelSubgroupAVCRefResult = 170, OCLIntelSubgroupAVCSicResult = 171, OCLIntelSubgroupAVCImeResultSingleReferenceStreamout = 172, OCLIntelSubgroupAVCImeResultDualReferenceStreamout = 173, OCLIntelSubgroupAVCImeSingleReferenceStreamin = 174, OCLIntelSubgroupAVCImeDualReferenceStreamin = 175, OCLIntelSubgroupAVCImeResultSingleRefStreamout = 172, OCLIntelSubgroupAVCImeResultDualRefStreamout = 173, OCLIntelSubgroupAVCImeSingleRefStreamin = 174, OCLIntelSubgroupAVCImeDualRefStreamin = 175, ExtVector = 176, Atomic = 177, BTFTagAttributed = 178 }
+CallingConv :: enum i32 {Default = 0, C = 1, X86StdCall = 2, X86FastCall = 3, X86ThisCall = 4, X86Pascal = 5, AAPCS = 6, AAPCS_VFP = 7, X86RegCall = 8, IntelOclBicc = 9, Win64 = 10, X86_64Win64 = 10, X86_64SysV = 11, X86VectorCall = 12, Swift = 13, PreserveMost = 14, PreserveAll = 15, AArch64VectorCall = 16, SwiftAsync = 17, AArch64SVEPCS = 18, M68kRTD = 19, PreserveNone = 20, RISCVVectorCall = 21, Invalid = 100, Unexposed = 200 }
+TemplateArgumentKind :: enum i32 {Null = 0, Type = 1, Declaration = 2, NullPtr = 3, Integral = 4, Template = 5, TemplateExpansion = 6, Expression = 7, Pack = 8, Invalid = 9 }
+TypeNullabilityKind :: enum i32 {NonNull = 0, Nullable = 1, Unspecified = 2, Invalid = 3, NullableResult = 4 }
+RefQualifierKind :: enum i32 {None = 0, LValue = 1, RValue = 2 }
+_CXXAccessSpecifier :: enum i32 {InvalidAccessSpecifier = 0, Public = 1, Protected = 2, Private = 3 }
+_StorageClass :: enum i32 {Invalid = 0, None = 1, Extern = 2, Static = 3, PrivateExtern = 4, OpenCLWorkGroupLocal = 5, Auto = 6, Register = 7 }
+_BinaryOperatorKind :: enum i32 {CX_BO_Invalid = 0, CX_BO_PtrMemD = 1, CX_BO_PtrMemI = 2, CX_BO_Mul = 3, CX_BO_Div = 4, CX_BO_Rem = 5, CX_BO_Add = 6, CX_BO_Sub = 7, CX_BO_Shl = 8, CX_BO_Shr = 9, CX_BO_Cmp = 10, CX_BO_LT = 11, CX_BO_GT = 12, CX_BO_LE = 13, CX_BO_GE = 14, CX_BO_EQ = 15, CX_BO_NE = 16, CX_BO_And = 17, CX_BO_Xor = 18, CX_BO_Or = 19, CX_BO_LAnd = 20, CX_BO_LOr = 21, CX_BO_Assign = 22, CX_BO_MulAssign = 23, CX_BO_DivAssign = 24, CX_BO_RemAssign = 25, CX_BO_AddAssign = 26, CX_BO_SubAssign = 27, CX_BO_ShlAssign = 28, CX_BO_ShrAssign = 29, CX_BO_AndAssign = 30, CX_BO_XorAssign = 31, CX_BO_OrAssign = 32, CX_BO_Comma = 33, CX_BO_LAST = 33 }
+ChildVisitResult :: enum i32 {Break = 0, Continue = 1, Recurse = 2 }
+PrintingPolicyProperty :: enum i32 {Indentation = 0, SuppressSpecifiers = 1, SuppressTagKeyword = 2, IncludeTagDefinition = 3, SuppressScope = 4, SuppressUnwrittenScope = 5, SuppressInitializers = 6, ConstantArraySizeAsWritten = 7, AnonymousTagLocations = 8, SuppressStrongLifetime = 9, SuppressLifetimeQualifiers = 10, SuppressTemplateArgsInCXXConstructors = 11, Bool = 12, Restrict = 13, Alignof = 14, UnderscoreAlignof = 15, UseVoidForZeroParams = 16, TerseOutput = 17, PolishForDeclaration = 18, Half = 19, MSWChar = 20, IncludeNewlines = 21, MSVCFormatting = 22, ConstantsAsWritten = 23, SuppressImplicitBase = 24, FullyQualifiedName = 25, LastProperty = 25 }
+ObjCPropertyAttrKind :: enum i32 {noattr = 0, readonly = 1, getter = 2, assign = 4, readwrite = 8, retain = 16, copy = 32, nonatomic = 64, setter = 128, atomic = 256, weak = 512, strong = 1024, unsafe_unretained = 2048, class = 4096 }
+ObjCDeclQualifierKind :: enum i32 {None = 0, In = 1, Inout = 2, Out = 4, Bycopy = 8, Byref = 16, Oneway = 32 }
+NameRefFlags :: enum i32 {WantQualifier = 1, WantTemplateArgs = 2, WantSinglePiece = 4 }
+TokenKind :: enum i32 {Punctuation = 0, Keyword = 1, Identifier = 2, Literal = 3, Comment = 4 }
+CompletionChunkKind :: enum i32 {Optional = 0, TypedText = 1, Text = 2, Placeholder = 3, Informative = 4, CurrentParameter = 5, LeftParen = 6, RightParen = 7, LeftBracket = 8, RightBracket = 9, LeftBrace = 10, RightBrace = 11, LeftAngle = 12, RightAngle = 13, Comma = 14, ResultType = 15, Colon = 16, SemiColon = 17, Equal = 18, HorizontalSpace = 19, VerticalSpace = 20 }
+CodeComplete_Flags :: enum i32 {IncludeMacros = 1, IncludeCodePatterns = 2, IncludeBriefComments = 4, SkipPreamble = 8, IncludeCompletionsWithFixIts = 16 }
+CompletionContext :: enum i32 {Unexposed = 0, AnyType = 1, AnyValue = 2, ObjCObjectValue = 4, ObjCSelectorValue = 8, CXXClassTypeValue = 16, DotMemberAccess = 32, ArrowMemberAccess = 64, ObjCPropertyAccess = 128, EnumTag = 256, UnionTag = 512, StructTag = 1024, ClassTag = 2048, Namespace = 4096, NestedNameSpecifier = 8192, ObjCInterface = 16384, ObjCProtocol = 32768, ObjCCategory = 65536, ObjCInstanceMessage = 131072, ObjCClassMessage = 262144, ObjCSelectorName = 524288, MacroName = 1048576, NaturalLanguage = 2097152, IncludedFile = 4194304, Unknown = 8388607 }
+EvalResultKind :: enum i32 {Int = 1, Float = 2, ObjCStrLiteral = 3, StrLiteral = 4, CFStr = 5, Other = 6, UnExposed = 0 }
+VisitorResult :: enum i32 {Break = 0, Continue = 1 }
+Result :: enum i32 {Success = 0, Invalid = 1, VisitBreak = 2 }
+IdxEntityKind :: enum i32 {Unexposed = 0, Typedef = 1, Function = 2, Variable = 3, Field = 4, EnumConstant = 5, ObjCClass = 6, ObjCProtocol = 7, ObjCCategory = 8, ObjCInstanceMethod = 9, ObjCClassMethod = 10, ObjCProperty = 11, ObjCIvar = 12, Enum = 13, Struct = 14, Union = 15, CXXClass = 16, CXXNamespace = 17, CXXNamespaceAlias = 18, CXXStaticVariable = 19, CXXStaticMethod = 20, CXXInstanceMethod = 21, CXXConstructor = 22, CXXDestructor = 23, CXXConversionFunction = 24, CXXTypeAlias = 25, CXXInterface = 26, CXXConcept = 27 }
+IdxEntityLanguage :: enum i32 {None = 0, C = 1, ObjC = 2, CXX = 3, Swift = 4 }
+IdxEntityCXXTemplateKind :: enum i32 {NonTemplate = 0, Template = 1, TemplatePartialSpecialization = 2, TemplateSpecialization = 3 }
+IdxAttrKind :: enum i32 {Unexposed = 0, IBAction = 1, IBOutlet = 2, IBOutletCollection = 3 }
+IdxDeclInfoFlags :: enum i32 {Skipped = 1 }
+IdxObjCContainerKind :: enum i32 {ForwardRef = 0, Interface = 1, Implementation = 2 }
+IdxEntityRefKind :: enum i32 {Direct = 1, Implicit = 2 }
+SymbolRole :: enum i32 {None = 0, Declaration = 1, Definition = 2, Reference = 4, Read = 8, Write = 16, Call = 32, Dynamic = 64, AddressOf = 128, Implicit = 256 }
+IndexOptFlags :: enum i32 {None = 0, SuppressRedundantRefs = 1, IndexFunctionLocalSymbols = 2, IndexImplicitTemplateInstantiations = 4, SuppressWarnings = 8, SkipParsedBodiesInSession = 16 }
+BinaryOperatorKind :: enum i32 {Invalid = 0, PtrMemD = 1, PtrMemI = 2, Mul = 3, Div = 4, Rem = 5, Add = 6, Sub = 7, Shl = 8, Shr = 9, Cmp = 10, LT = 11, GT = 12, LE = 13, GE = 14, EQ = 15, NE = 16, And = 17, Xor = 18, Or = 19, LAnd = 20, LOr = 21, Assign = 22, MulAssign = 23, DivAssign = 24, RemAssign = 25, AddAssign = 26, SubAssign = 27, ShlAssign = 28, ShrAssign = 29, AndAssign = 30, XorAssign = 31, OrAssign = 32, Comma = 33 }
+UnaryOperatorKind :: enum i32 {Invalid = 0, PostInc = 1, PostDec = 2, PreInc = 3, PreDec = 4, AddrOf = 5, Deref = 6, Plus = 7, Minus = 8, Not = 9, LNot = 10, Real = 11, Imag = 12, Extension = 13, Coawait = 14 }
 
-foreign import clang_runic "lib/windows/x86_64/libclang.lib"
+}
 
-} else {
+when (ODIN_OS == .Linux) || (ODIN_OS == .Darwin) || (ODIN_OS == .FreeBSD || ODIN_OS == .OpenBSD || ODIN_OS == .NetBSD) {
 
+CompilationDatabase_Error :: enum u32 {NoError = 0, CanNotLoadDatabase = 1 }
+DiagnosticSeverity :: enum u32 {Ignored = 0, Note = 1, Warning = 2, Error = 3, Fatal = 4 }
+LoadDiag_Error :: enum u32 {None = 0, Unknown = 1, CannotLoad = 2, InvalidFile = 3 }
+DiagnosticDisplayOptions :: enum u32 {DisplaySourceLocation = 1, DisplayColumn = 2, DisplaySourceRanges = 4, DisplayOption = 8, DisplayCategoryId = 16, DisplayCategoryName = 32 }
+ErrorCode :: enum u32 {Success = 0, Failure = 1, Crashed = 2, InvalidArguments = 3, ASTReadError = 4 }
+CommentKind :: enum u32 {Null = 0, Text = 1, InlineCommand = 2, HTMLStartTag = 3, HTMLEndTag = 4, Paragraph = 5, BlockCommand = 6, ParamCommand = 7, TParamCommand = 8, VerbatimBlockCommand = 9, VerbatimBlockLine = 10, VerbatimLine = 11, FullComment = 12 }
+CommentInlineCommandRenderKind :: enum u32 {Normal = 0, Bold = 1, Monospaced = 2, Emphasized = 3, Anchor = 4 }
+CommentParamPassDirection :: enum u32 {In = 0, Out = 1, InOut = 2 }
 UnsavedFile :: struct {
     Filename: cstring,
     Contents: cstring,
     Length: u64,
 }
+AvailabilityKind :: enum u32 {Available = 0, Deprecated = 1, NotAvailable = 2, NotAccessible = 3 }
+Cursor_ExceptionSpecificationKind :: enum u32 {None = 0, DynamicNone = 1, Dynamic = 2, MSAny = 3, BasicNoexcept = 4, ComputedNoexcept = 5, Unevaluated = 6, Uninstantiated = 7, Unparsed = 8, NoThrow = 9 }
+Choice :: enum u32 {Default = 0, Enabled = 1, Disabled = 2 }
+GlobalOptFlags :: enum u32 {None = 0, ThreadBackgroundPriorityForIndexing = 1, ThreadBackgroundPriorityForEditing = 2, ThreadBackgroundPriorityForAll = 3 }
+TranslationUnit_Flags :: enum u32 {None = 0, DetailedPreprocessingRecord = 1, Incomplete = 2, PrecompiledPreamble = 4, CacheCompletionResults = 8, ForSerialization = 16, CXXChainedPCH = 32, SkipFunctionBodies = 64, IncludeBriefCommentsInCodeCompletion = 128, CreatePreambleOnFirstParse = 256, KeepGoing = 512, SingleFileParse = 1024, LimitSkipFunctionBodiesToPreamble = 2048, IncludeAttributedTypes = 4096, VisitImplicitAttributes = 8192, IgnoreNonErrorsFromIncludedFiles = 16384, RetainExcludedConditionalBlocks = 32768 }
+SaveTranslationUnit_Flags :: enum u32 {None = 0 }
+SaveError :: enum u32 {None = 0, Unknown = 1, TranslationErrors = 2, InvalidTU = 3 }
+Reparse_Flags :: enum u32 {None = 0 }
+TUResourceUsageKind :: enum u32 {AST = 1, Identifiers = 2, Selectors = 3, GlobalCompletionResults = 4, SourceManagerContentCache = 5, AST_SideTables = 6, SourceManager_Membuffer_Malloc = 7, SourceManager_Membuffer_MMap = 8, ExternalASTSource_Membuffer_Malloc = 9, ExternalASTSource_Membuffer_MMap = 10, Preprocessor = 11, PreprocessingRecord = 12, SourceManager_DataStructures = 13, Preprocessor_HeaderSearch = 14, MEMORY_IN_BYTES_BEGIN = 1, MEMORY_IN_BYTES_END = 14, First = 1, Last = 14 }
 TUResourceUsageEntry :: struct {
     kind: TUResourceUsageKind,
     amount: u64,
 }
-time_t :: i64
+CursorKind :: enum u32 {UnexposedDecl = 1, StructDecl = 2, UnionDecl = 3, ClassDecl = 4, EnumDecl = 5, FieldDecl = 6, EnumConstantDecl = 7, FunctionDecl = 8, VarDecl = 9, ParmDecl = 10, ObjCInterfaceDecl = 11, ObjCCategoryDecl = 12, ObjCProtocolDecl = 13, ObjCPropertyDecl = 14, ObjCIvarDecl = 15, ObjCInstanceMethodDecl = 16, ObjCClassMethodDecl = 17, ObjCImplementationDecl = 18, ObjCCategoryImplDecl = 19, TypedefDecl = 20, CXXMethod = 21, Namespace = 22, LinkageSpec = 23, Constructor = 24, Destructor = 25, ConversionFunction = 26, TemplateTypeParameter = 27, NonTypeTemplateParameter = 28, TemplateTemplateParameter = 29, FunctionTemplate = 30, ClassTemplate = 31, ClassTemplatePartialSpecialization = 32, NamespaceAlias = 33, UsingDirective = 34, UsingDeclaration = 35, TypeAliasDecl = 36, ObjCSynthesizeDecl = 37, ObjCDynamicDecl = 38, CXXAccessSpecifier = 39, FirstDecl = 1, LastDecl = 39, FirstRef = 40, ObjCSuperClassRef = 40, ObjCProtocolRef = 41, ObjCClassRef = 42, TypeRef = 43, CXXBaseSpecifier = 44, TemplateRef = 45, NamespaceRef = 46, MemberRef = 47, LabelRef = 48, OverloadedDeclRef = 49, VariableRef = 50, LastRef = 50, FirstInvalid = 70, InvalidFile = 70, NoDeclFound = 71, NotImplemented = 72, InvalidCode = 73, LastInvalid = 73, FirstExpr = 100, UnexposedExpr = 100, DeclRefExpr = 101, MemberRefExpr = 102, CallExpr = 103, ObjCMessageExpr = 104, BlockExpr = 105, IntegerLiteral = 106, FloatingLiteral = 107, ImaginaryLiteral = 108, StringLiteral = 109, CharacterLiteral = 110, ParenExpr = 111, UnaryOperator = 112, ArraySubscriptExpr = 113, BinaryOperator = 114, CompoundAssignOperator = 115, ConditionalOperator = 116, CStyleCastExpr = 117, CompoundLiteralExpr = 118, InitListExpr = 119, AddrLabelExpr = 120, StmtExpr = 121, GenericSelectionExpr = 122, GNUNullExpr = 123, CXXStaticCastExpr = 124, CXXDynamicCastExpr = 125, CXXReinterpretCastExpr = 126, CXXConstCastExpr = 127, CXXFunctionalCastExpr = 128, CXXTypeidExpr = 129, CXXBoolLiteralExpr = 130, CXXNullPtrLiteralExpr = 131, CXXThisExpr = 132, CXXThrowExpr = 133, CXXNewExpr = 134, CXXDeleteExpr = 135, UnaryExpr = 136, ObjCStringLiteral = 137, ObjCEncodeExpr = 138, ObjCSelectorExpr = 139, ObjCProtocolExpr = 140, ObjCBridgedCastExpr = 141, PackExpansionExpr = 142, SizeOfPackExpr = 143, LambdaExpr = 144, ObjCBoolLiteralExpr = 145, ObjCSelfExpr = 146, ArraySectionExpr = 147, ObjCAvailabilityCheckExpr = 148, FixedPointLiteral = 149, OMPArrayShapingExpr = 150, OMPIteratorExpr = 151, CXXAddrspaceCastExpr = 152, ConceptSpecializationExpr = 153, RequiresExpr = 154, CXXParenListInitExpr = 155, PackIndexingExpr = 156, LastExpr = 156, FirstStmt = 200, UnexposedStmt = 200, LabelStmt = 201, CompoundStmt = 202, CaseStmt = 203, DefaultStmt = 204, IfStmt = 205, SwitchStmt = 206, WhileStmt = 207, DoStmt = 208, ForStmt = 209, GotoStmt = 210, IndirectGotoStmt = 211, ContinueStmt = 212, BreakStmt = 213, ReturnStmt = 214, GCCAsmStmt = 215, AsmStmt = 215, ObjCAtTryStmt = 216, ObjCAtCatchStmt = 217, ObjCAtFinallyStmt = 218, ObjCAtThrowStmt = 219, ObjCAtSynchronizedStmt = 220, ObjCAutoreleasePoolStmt = 221, ObjCForCollectionStmt = 222, CXXCatchStmt = 223, CXXTryStmt = 224, CXXForRangeStmt = 225, SEHTryStmt = 226, SEHExceptStmt = 227, SEHFinallyStmt = 228, MSAsmStmt = 229, NullStmt = 230, DeclStmt = 231, OMPParallelDirective = 232, OMPSimdDirective = 233, OMPForDirective = 234, OMPSectionsDirective = 235, OMPSectionDirective = 236, OMPSingleDirective = 237, OMPParallelForDirective = 238, OMPParallelSectionsDirective = 239, OMPTaskDirective = 240, OMPMasterDirective = 241, OMPCriticalDirective = 242, OMPTaskyieldDirective = 243, OMPBarrierDirective = 244, OMPTaskwaitDirective = 245, OMPFlushDirective = 246, SEHLeaveStmt = 247, OMPOrderedDirective = 248, OMPAtomicDirective = 249, OMPForSimdDirective = 250, OMPParallelForSimdDirective = 251, OMPTargetDirective = 252, OMPTeamsDirective = 253, OMPTaskgroupDirective = 254, OMPCancellationPointDirective = 255, OMPCancelDirective = 256, OMPTargetDataDirective = 257, OMPTaskLoopDirective = 258, OMPTaskLoopSimdDirective = 259, OMPDistributeDirective = 260, OMPTargetEnterDataDirective = 261, OMPTargetExitDataDirective = 262, OMPTargetParallelDirective = 263, OMPTargetParallelForDirective = 264, OMPTargetUpdateDirective = 265, OMPDistributeParallelForDirective = 266, OMPDistributeParallelForSimdDirective = 267, OMPDistributeSimdDirective = 268, OMPTargetParallelForSimdDirective = 269, OMPTargetSimdDirective = 270, OMPTeamsDistributeDirective = 271, OMPTeamsDistributeSimdDirective = 272, OMPTeamsDistributeParallelForSimdDirective = 273, OMPTeamsDistributeParallelForDirective = 274, OMPTargetTeamsDirective = 275, OMPTargetTeamsDistributeDirective = 276, OMPTargetTeamsDistributeParallelForDirective = 277, OMPTargetTeamsDistributeParallelForSimdDirective = 278, OMPTargetTeamsDistributeSimdDirective = 279, BuiltinBitCastExpr = 280, OMPMasterTaskLoopDirective = 281, OMPParallelMasterTaskLoopDirective = 282, OMPMasterTaskLoopSimdDirective = 283, OMPParallelMasterTaskLoopSimdDirective = 284, OMPParallelMasterDirective = 285, OMPDepobjDirective = 286, OMPScanDirective = 287, OMPTileDirective = 288, OMPCanonicalLoop = 289, OMPInteropDirective = 290, OMPDispatchDirective = 291, OMPMaskedDirective = 292, OMPUnrollDirective = 293, OMPMetaDirective = 294, OMPGenericLoopDirective = 295, OMPTeamsGenericLoopDirective = 296, OMPTargetTeamsGenericLoopDirective = 297, OMPParallelGenericLoopDirective = 298, OMPTargetParallelGenericLoopDirective = 299, OMPParallelMaskedDirective = 300, OMPMaskedTaskLoopDirective = 301, OMPMaskedTaskLoopSimdDirective = 302, OMPParallelMaskedTaskLoopDirective = 303, OMPParallelMaskedTaskLoopSimdDirective = 304, OMPErrorDirective = 305, OMPScopeDirective = 306, OMPReverseDirective = 307, OMPInterchangeDirective = 308, OpenACCComputeConstruct = 320, OpenACCLoopConstruct = 321, LastStmt = 321, TranslationUnit = 350, FirstAttr = 400, UnexposedAttr = 400, IBActionAttr = 401, IBOutletAttr = 402, IBOutletCollectionAttr = 403, CXXFinalAttr = 404, CXXOverrideAttr = 405, AnnotateAttr = 406, AsmLabelAttr = 407, PackedAttr = 408, PureAttr = 409, ConstAttr = 410, NoDuplicateAttr = 411, CUDAConstantAttr = 412, CUDADeviceAttr = 413, CUDAGlobalAttr = 414, CUDAHostAttr = 415, CUDASharedAttr = 416, VisibilityAttr = 417, DLLExport = 418, DLLImport = 419, NSReturnsRetained = 420, NSReturnsNotRetained = 421, NSReturnsAutoreleased = 422, NSConsumesSelf = 423, NSConsumed = 424, ObjCException = 425, ObjCNSObject = 426, ObjCIndependentClass = 427, ObjCPreciseLifetime = 428, ObjCReturnsInnerPointer = 429, ObjCRequiresSuper = 430, ObjCRootClass = 431, ObjCSubclassingRestricted = 432, ObjCExplicitProtocolImpl = 433, ObjCDesignatedInitializer = 434, ObjCRuntimeVisible = 435, ObjCBoxable = 436, FlagEnum = 437, ConvergentAttr = 438, WarnUnusedAttr = 439, WarnUnusedResultAttr = 440, AlignedAttr = 441, LastAttr = 441, PreprocessingDirective = 500, MacroDefinition = 501, MacroExpansion = 502, MacroInstantiation = 502, InclusionDirective = 503, FirstPreprocessing = 500, LastPreprocessing = 503, ModuleImportDecl = 600, TypeAliasTemplateDecl = 601, StaticAssert = 602, FriendDecl = 603, ConceptDecl = 604, FirstExtraDecl = 600, LastExtraDecl = 604, OverloadCandidate = 700 }
+LinkageKind :: enum u32 {Invalid = 0, NoLinkage = 1, Internal = 2, UniqueExternal = 3, External = 4 }
+VisibilityKind :: enum u32 {Invalid = 0, Hidden = 1, Protected = 2, Default = 3 }
+LanguageKind :: enum u32 {Invalid = 0, C = 1, ObjC = 2, CPlusPlus = 3 }
+TLSKind :: enum u32 {None = 0, Dynamic = 1, Static = 2 }
+TypeKind :: enum u32 {Invalid = 0, Unexposed = 1, Void = 2, Bool = 3, Char_U = 4, UChar = 5, Char16 = 6, Char32 = 7, UShort = 8, UInt = 9, ULong = 10, ULongLong = 11, UInt128 = 12, Char_S = 13, SChar = 14, WChar = 15, Short = 16, Int = 17, Long = 18, LongLong = 19, Int128 = 20, Float = 21, Double = 22, LongDouble = 23, NullPtr = 24, Overload = 25, Dependent = 26, ObjCId = 27, ObjCClass = 28, ObjCSel = 29, Float128 = 30, Half = 31, Float16 = 32, ShortAccum = 33, Accum = 34, LongAccum = 35, UShortAccum = 36, UAccum = 37, ULongAccum = 38, BFloat16 = 39, Ibm128 = 40, FirstBuiltin = 2, LastBuiltin = 40, Complex = 100, Pointer = 101, BlockPointer = 102, LValueReference = 103, RValueReference = 104, Record = 105, Enum = 106, Typedef = 107, ObjCInterface = 108, ObjCObjectPointer = 109, FunctionNoProto = 110, FunctionProto = 111, ConstantArray = 112, Vector = 113, IncompleteArray = 114, VariableArray = 115, DependentSizedArray = 116, MemberPointer = 117, Auto = 118, Elaborated = 119, Pipe = 120, OCLImage1dRO = 121, OCLImage1dArrayRO = 122, OCLImage1dBufferRO = 123, OCLImage2dRO = 124, OCLImage2dArrayRO = 125, OCLImage2dDepthRO = 126, OCLImage2dArrayDepthRO = 127, OCLImage2dMSAARO = 128, OCLImage2dArrayMSAARO = 129, OCLImage2dMSAADepthRO = 130, OCLImage2dArrayMSAADepthRO = 131, OCLImage3dRO = 132, OCLImage1dWO = 133, OCLImage1dArrayWO = 134, OCLImage1dBufferWO = 135, OCLImage2dWO = 136, OCLImage2dArrayWO = 137, OCLImage2dDepthWO = 138, OCLImage2dArrayDepthWO = 139, OCLImage2dMSAAWO = 140, OCLImage2dArrayMSAAWO = 141, OCLImage2dMSAADepthWO = 142, OCLImage2dArrayMSAADepthWO = 143, OCLImage3dWO = 144, OCLImage1dRW = 145, OCLImage1dArrayRW = 146, OCLImage1dBufferRW = 147, OCLImage2dRW = 148, OCLImage2dArrayRW = 149, OCLImage2dDepthRW = 150, OCLImage2dArrayDepthRW = 151, OCLImage2dMSAARW = 152, OCLImage2dArrayMSAARW = 153, OCLImage2dMSAADepthRW = 154, OCLImage2dArrayMSAADepthRW = 155, OCLImage3dRW = 156, OCLSampler = 157, OCLEvent = 158, OCLQueue = 159, OCLReserveID = 160, ObjCObject = 161, ObjCTypeParam = 162, Attributed = 163, OCLIntelSubgroupAVCMcePayload = 164, OCLIntelSubgroupAVCImePayload = 165, OCLIntelSubgroupAVCRefPayload = 166, OCLIntelSubgroupAVCSicPayload = 167, OCLIntelSubgroupAVCMceResult = 168, OCLIntelSubgroupAVCImeResult = 169, OCLIntelSubgroupAVCRefResult = 170, OCLIntelSubgroupAVCSicResult = 171, OCLIntelSubgroupAVCImeResultSingleReferenceStreamout = 172, OCLIntelSubgroupAVCImeResultDualReferenceStreamout = 173, OCLIntelSubgroupAVCImeSingleReferenceStreamin = 174, OCLIntelSubgroupAVCImeDualReferenceStreamin = 175, OCLIntelSubgroupAVCImeResultSingleRefStreamout = 172, OCLIntelSubgroupAVCImeResultDualRefStreamout = 173, OCLIntelSubgroupAVCImeSingleRefStreamin = 174, OCLIntelSubgroupAVCImeDualRefStreamin = 175, ExtVector = 176, Atomic = 177, BTFTagAttributed = 178 }
+CallingConv :: enum u32 {Default = 0, C = 1, X86StdCall = 2, X86FastCall = 3, X86ThisCall = 4, X86Pascal = 5, AAPCS = 6, AAPCS_VFP = 7, X86RegCall = 8, IntelOclBicc = 9, Win64 = 10, X86_64Win64 = 10, X86_64SysV = 11, X86VectorCall = 12, Swift = 13, PreserveMost = 14, PreserveAll = 15, AArch64VectorCall = 16, SwiftAsync = 17, AArch64SVEPCS = 18, M68kRTD = 19, PreserveNone = 20, RISCVVectorCall = 21, Invalid = 100, Unexposed = 200 }
+TemplateArgumentKind :: enum u32 {Null = 0, Type = 1, Declaration = 2, NullPtr = 3, Integral = 4, Template = 5, TemplateExpansion = 6, Expression = 7, Pack = 8, Invalid = 9 }
+TypeNullabilityKind :: enum u32 {NonNull = 0, Nullable = 1, Unspecified = 2, Invalid = 3, NullableResult = 4 }
+RefQualifierKind :: enum u32 {None = 0, LValue = 1, RValue = 2 }
+_CXXAccessSpecifier :: enum u32 {InvalidAccessSpecifier = 0, Public = 1, Protected = 2, Private = 3 }
+_StorageClass :: enum u32 {Invalid = 0, None = 1, Extern = 2, Static = 3, PrivateExtern = 4, OpenCLWorkGroupLocal = 5, Auto = 6, Register = 7 }
+_BinaryOperatorKind :: enum u32 {CX_BO_Invalid = 0, CX_BO_PtrMemD = 1, CX_BO_PtrMemI = 2, CX_BO_Mul = 3, CX_BO_Div = 4, CX_BO_Rem = 5, CX_BO_Add = 6, CX_BO_Sub = 7, CX_BO_Shl = 8, CX_BO_Shr = 9, CX_BO_Cmp = 10, CX_BO_LT = 11, CX_BO_GT = 12, CX_BO_LE = 13, CX_BO_GE = 14, CX_BO_EQ = 15, CX_BO_NE = 16, CX_BO_And = 17, CX_BO_Xor = 18, CX_BO_Or = 19, CX_BO_LAnd = 20, CX_BO_LOr = 21, CX_BO_Assign = 22, CX_BO_MulAssign = 23, CX_BO_DivAssign = 24, CX_BO_RemAssign = 25, CX_BO_AddAssign = 26, CX_BO_SubAssign = 27, CX_BO_ShlAssign = 28, CX_BO_ShrAssign = 29, CX_BO_AndAssign = 30, CX_BO_XorAssign = 31, CX_BO_OrAssign = 32, CX_BO_Comma = 33, CX_BO_LAST = 33 }
+ChildVisitResult :: enum u32 {Break = 0, Continue = 1, Recurse = 2 }
+PrintingPolicyProperty :: enum u32 {Indentation = 0, SuppressSpecifiers = 1, SuppressTagKeyword = 2, IncludeTagDefinition = 3, SuppressScope = 4, SuppressUnwrittenScope = 5, SuppressInitializers = 6, ConstantArraySizeAsWritten = 7, AnonymousTagLocations = 8, SuppressStrongLifetime = 9, SuppressLifetimeQualifiers = 10, SuppressTemplateArgsInCXXConstructors = 11, Bool = 12, Restrict = 13, Alignof = 14, UnderscoreAlignof = 15, UseVoidForZeroParams = 16, TerseOutput = 17, PolishForDeclaration = 18, Half = 19, MSWChar = 20, IncludeNewlines = 21, MSVCFormatting = 22, ConstantsAsWritten = 23, SuppressImplicitBase = 24, FullyQualifiedName = 25, LastProperty = 25 }
+ObjCPropertyAttrKind :: enum u32 {noattr = 0, readonly = 1, getter = 2, assign = 4, readwrite = 8, retain = 16, copy = 32, nonatomic = 64, setter = 128, atomic = 256, weak = 512, strong = 1024, unsafe_unretained = 2048, class = 4096 }
+ObjCDeclQualifierKind :: enum u32 {None = 0, In = 1, Inout = 2, Out = 4, Bycopy = 8, Byref = 16, Oneway = 32 }
+NameRefFlags :: enum u32 {WantQualifier = 1, WantTemplateArgs = 2, WantSinglePiece = 4 }
+TokenKind :: enum u32 {Punctuation = 0, Keyword = 1, Identifier = 2, Literal = 3, Comment = 4 }
+CompletionChunkKind :: enum u32 {Optional = 0, TypedText = 1, Text = 2, Placeholder = 3, Informative = 4, CurrentParameter = 5, LeftParen = 6, RightParen = 7, LeftBracket = 8, RightBracket = 9, LeftBrace = 10, RightBrace = 11, LeftAngle = 12, RightAngle = 13, Comma = 14, ResultType = 15, Colon = 16, SemiColon = 17, Equal = 18, HorizontalSpace = 19, VerticalSpace = 20 }
+CodeComplete_Flags :: enum u32 {IncludeMacros = 1, IncludeCodePatterns = 2, IncludeBriefComments = 4, SkipPreamble = 8, IncludeCompletionsWithFixIts = 16 }
+CompletionContext :: enum u32 {Unexposed = 0, AnyType = 1, AnyValue = 2, ObjCObjectValue = 4, ObjCSelectorValue = 8, CXXClassTypeValue = 16, DotMemberAccess = 32, ArrowMemberAccess = 64, ObjCPropertyAccess = 128, EnumTag = 256, UnionTag = 512, StructTag = 1024, ClassTag = 2048, Namespace = 4096, NestedNameSpecifier = 8192, ObjCInterface = 16384, ObjCProtocol = 32768, ObjCCategory = 65536, ObjCInstanceMessage = 131072, ObjCClassMessage = 262144, ObjCSelectorName = 524288, MacroName = 1048576, NaturalLanguage = 2097152, IncludedFile = 4194304, Unknown = 8388607 }
+EvalResultKind :: enum u32 {Int = 1, Float = 2, ObjCStrLiteral = 3, StrLiteral = 4, CFStr = 5, Other = 6, UnExposed = 0 }
+VisitorResult :: enum u32 {Break = 0, Continue = 1 }
+Result :: enum u32 {Success = 0, Invalid = 1, VisitBreak = 2 }
+IdxEntityKind :: enum u32 {Unexposed = 0, Typedef = 1, Function = 2, Variable = 3, Field = 4, EnumConstant = 5, ObjCClass = 6, ObjCProtocol = 7, ObjCCategory = 8, ObjCInstanceMethod = 9, ObjCClassMethod = 10, ObjCProperty = 11, ObjCIvar = 12, Enum = 13, Struct = 14, Union = 15, CXXClass = 16, CXXNamespace = 17, CXXNamespaceAlias = 18, CXXStaticVariable = 19, CXXStaticMethod = 20, CXXInstanceMethod = 21, CXXConstructor = 22, CXXDestructor = 23, CXXConversionFunction = 24, CXXTypeAlias = 25, CXXInterface = 26, CXXConcept = 27 }
+IdxEntityLanguage :: enum u32 {None = 0, C = 1, ObjC = 2, CXX = 3, Swift = 4 }
+IdxEntityCXXTemplateKind :: enum u32 {NonTemplate = 0, Template = 1, TemplatePartialSpecialization = 2, TemplateSpecialization = 3 }
+IdxAttrKind :: enum u32 {Unexposed = 0, IBAction = 1, IBOutlet = 2, IBOutletCollection = 3 }
+IdxDeclInfoFlags :: enum u32 {Skipped = 1 }
+IdxObjCContainerKind :: enum u32 {ForwardRef = 0, Interface = 1, Implementation = 2 }
+IdxEntityRefKind :: enum u32 {Direct = 1, Implicit = 2 }
+SymbolRole :: enum u32 {None = 0, Declaration = 1, Definition = 2, Reference = 4, Read = 8, Write = 16, Call = 32, Dynamic = 64, AddressOf = 128, Implicit = 256 }
+IndexOptFlags :: enum u32 {None = 0, SuppressRedundantRefs = 1, IndexFunctionLocalSymbols = 2, IndexImplicitTemplateInstantiations = 4, SuppressWarnings = 8, SkipParsedBodiesInSession = 16 }
+BinaryOperatorKind :: enum u32 {Invalid = 0, PtrMemD = 1, PtrMemI = 2, Mul = 3, Div = 4, Rem = 5, Add = 6, Sub = 7, Shl = 8, Shr = 9, Cmp = 10, LT = 11, GT = 12, LE = 13, GE = 14, EQ = 15, NE = 16, And = 17, Xor = 18, Or = 19, LAnd = 20, LOr = 21, Assign = 22, MulAssign = 23, DivAssign = 24, RemAssign = 25, AddAssign = 26, SubAssign = 27, ShlAssign = 28, ShrAssign = 29, AndAssign = 30, XorAssign = 31, OrAssign = 32, Comma = 33 }
+UnaryOperatorKind :: enum u32 {Invalid = 0, PostInc = 1, PostDec = 2, PreInc = 3, PreDec = 4, AddrOf = 5, Deref = 6, Plus = 7, Minus = 8, Not = 9, LNot = 10, Real = 11, Imag = 12, Extension = 13, Coawait = 14 }
 
-when #config(CLANG_STATIC, false) {
-    when ODIN_OS == .Darwin {
-    foreign import clang_runic "system:clang"
-} else {
-    foreign import clang_runic "system:libclang.a"
 }
-} else {
-    foreign import clang_runic "system:clang"
+
+when (ODIN_OS == .Windows) && (ODIN_ARCH == .amd64) {
+
+foreign import clang_runic "lib/windows/x86_64/libclang.lib"
+
 }
+
+when (ODIN_OS == .Windows) && (ODIN_ARCH == .arm64) {
+
+foreign import clang_runic "lib/windows/arm64/libclang.lib"
+
+}
+
+when (ODIN_OS == .Linux) || (ODIN_OS == .Darwin) || (ODIN_OS == .FreeBSD || ODIN_OS == .OpenBSD || ODIN_OS == .NetBSD) {
+
+foreign import clang_runic "system:clang"
 
 }
 
