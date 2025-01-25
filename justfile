@@ -27,8 +27,7 @@ download-library LIB_DIR='lib/windows/x86_64' BIN_DIR='': (make-directory 'build
   @echo 'This will download llvm including libclang.dll and libclang.lib and then copy them into the given directory'
 
   if (-not (Test-Path build\cache\llvm.tar.xz)) { if (Get-Command -Name 'curl.exe' -ErrorAction SilentlyContinue) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz } else { Invoke-Webrequest -Uri "{{ LIBRARY_DOWNLOAD_LINK }}" -OutFile build\cache\llvm.tar.xz } }
-  if (-not (Test-Path build\cache\libclang.dll)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/bin/libclang.dll" }
-  if (-not (Test-Path build\cache\libclang.lib)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/lib/libclang.lib" }
+  if (-not (Test-Path build\cache\libclang.dll) -or -not (Test-Path build\cache\libclang.lib)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/bin/libclang.dll" "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/lib/libclang.lib" }
   {{ if LIB_DIR != '' { 'Copy-Item -Path build\cache\libclang.lib -Destination "' + LIB_DIR + '" -Force' } else { '' } }}
   {{ if BIN_DIR != '' { 'Copy-Item -Path build\cache\libclang.dll -Destination "' + BIN_DIR + '" -Force' } else { '' } }}
 
@@ -42,13 +41,9 @@ download-library LIB_DIR='lib/windows/x86_64/' BIN_DIR='': (make-directory 'buil
     then
         curl -SL "{{ LIBRARY_DOWNLOAD_LINK }}" --output build/cache/llvm.tar.xz
     fi
-    if [[ ! -f 'build/cache/libclang.dll' ]]
+    if [[ ! -f 'build/cache/libclang.dll' || ! -f 'build/cache/libclang.lib' ]]
     then
-        tar -xvf 'build/cache/llvm.tar.xz' -C 'build/cache' --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/bin/libclang.dll"
-    fi
-    if [[ ! -f 'build/cache/libclang.lib' ]]
-    then
-        tar -xvf 'build/cache/llvm.tar.xz' -C 'build/cache' --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/lib/libclang.lib"
+        tar -xvf 'build/cache/llvm.tar.xz' -C 'build/cache' --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/bin/libclang.dll" "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/lib/libclang.lib"
     fi
     {{ if LIB_DIR != '' { 'cp "build/cache/libclang.lib" "' + LIB_DIR + '"' } else { '' } }}
     {{ if BIN_DIR != '' { 'cp "build/cache/libclang.dll" "' + BIN_DIR + '"' } else { '' } }}
