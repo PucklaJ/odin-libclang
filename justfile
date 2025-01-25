@@ -33,7 +33,7 @@ download-library LIB_DIR='lib/windows/x86_64' BIN_DIR='': (make-directory 'build
 
 [unix]
 download-library LIB_DIR='lib/windows/x86_64/' BIN_DIR='': (make-directory 'build/cache') (make-directory LIB_DIR) (make-directory BIN_DIR) (make-directory 'build/cache/llvm')
-    #! /bin/sh
+    #! /bin/bash
     echo 'This will download llvm including libclang.dll and libclang.lib and then copy them into the given directory'
     set -ex
 
@@ -51,7 +51,7 @@ download-library LIB_DIR='lib/windows/x86_64/' BIN_DIR='': (make-directory 'buil
 LLVM_DEFAULT_TAG := 'llvmorg-' + LLVM_VERSION
 [unix]
 update-sources TAG=LLVM_DEFAULT_TAG: (make-directory 'shared/clang-c')
-    #! /bin/sh
+    #! /bin/bash
     for header_file in 'BuildSystem.h' 'CXCompilationDatabase.h' 'CXDiagnostic.h' 'CXErrorCode.h' 'CXFile.h' 'CXSourceLocation.h' 'CXString.h' 'Documentation.h' 'ExternC.h' 'FatalErrorHandler.h' 'Index.h' 'Platform.h' 'Rewrite.h'
     do
         echo "Downloading $header_file"
