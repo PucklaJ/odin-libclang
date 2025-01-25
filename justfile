@@ -16,23 +16,26 @@ example: (make-directory 'build')
 
 [unix]
 make-directory DIR:
-  @mkdir -p {{ DIR }}
+  @if [[ "{{ DIR }}" != '' ]]; then mkdir -p "{{ DIR }}"; fi
 
 [windows]
 make-directory DIR:
   @New-Item -Path "{{ DIR }}" -ItemType Directory -Force | Out-Null
 
 [windows]
-download-library DIR='build': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
-  @echo This will download llvm including libclang.dll and then copy libclang.dll into the given directory
+download-library LIB_DIR='lib/windows/x86_64' BIN_DIR='': (make-directory 'build/cache') (make-directory LIB_DIR) (make-directory BIN_DIR) (make-directory 'build/cache/llvm')
+  @echo 'This will download llvm including libclang.dll and libclang.lib and then copy them into the given directory'
 
-  if (-not (Test-Path build\cache\llvm.tar.xz)) { if (Get-Command -Name 'curl.exe' -ErrorAction SilentlyContinue) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz } else { Invoke-Webrequest -Uri {{ LIBRARY_DOWNLOAD_LINK }} -OutFile build\cache\llvm.tar.xz } }
-  if (-not (Test-Path build\cache\libclang.dll)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-" + LLVM_VERSION + "-x86_64-pc-windows-msvc/bin/libclang.dll" }
-  Copy-Item -Path build\cache\libclang.dll -Destination {{ DIR }} -Force
+  if (-not (Test-Path build\cache\llvm.tar.xz)) { if (Get-Command -Name 'curl.exe' -ErrorAction SilentlyContinue) { curl.exe -L {{ LIBRARY_DOWNLOAD_LINK }} -o build\cache\llvm.tar.xz } else { Invoke-Webrequest -Uri "{{ LIBRARY_DOWNLOAD_LINK }}" -OutFile build\cache\llvm.tar.xz } }
+  if (-not (Test-Path build\cache\libclang.dll)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/bin/libclang.dll" }
+  if (-not (Test-Path build\cache\libclang.lib)) { tar -xvf build\cache\llvm.tar.xz -C build\cache --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/lib/libclang.lib" }
+  {{ if LIB_DIR != '' { 'Copy-Item -Path build\cache\libclang.lib -Destination "' + LIB_DIR + '" -Force' } else { '' } }}
+  {{ if BIN_DIR != '' { 'Copy-Item -Path build\cache\libclang.dll -Destination "' + BIN_DIR + '" -Force' } else { '' } }}
 
 [unix]
-download-library DIR='lib/windows/x86_64/': (make-directory 'build/cache') (make-directory DIR) (make-directory 'build/cache/llvm')
+download-library LIB_DIR='lib/windows/x86_64/' BIN_DIR='': (make-directory 'build/cache') (make-directory LIB_DIR) (make-directory BIN_DIR) (make-directory 'build/cache/llvm')
     #! /bin/sh
+    echo 'This will download llvm including libclang.dll and libclang.lib and then copy them into the given directory'
     set -ex
 
     if [[ ! -f 'build/cache/llvm.tar.xz' ]]
@@ -42,9 +45,13 @@ download-library DIR='lib/windows/x86_64/': (make-directory 'build/cache') (make
     if [[ ! -f 'build/cache/libclang.dll' ]]
     then
         tar -xvf 'build/cache/llvm.tar.xz' -C 'build/cache' --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/bin/libclang.dll"
+    fi
+    if [[ ! -f 'build/cache/libclang.lib' ]]
+    then
         tar -xvf 'build/cache/llvm.tar.xz' -C 'build/cache' --strip-components=2 "clang+llvm-{{ LLVM_VERSION }}-x86_64-pc-windows-msvc/lib/libclang.lib"
     fi
-    cp 'build/cache/libclang.dll' 'build/cache/libclang.lib' {{ DIR }}
+    {{ if LIB_DIR != '' { 'cp "build/cache/libclang.lib" "' + LIB_DIR + '"' } else { '' } }}
+    {{ if BIN_DIR != '' { 'cp "build/cache/libclang.dll" "' + BIN_DIR + '"' } else { '' } }}
 
 LLVM_DEFAULT_TAG := 'llvmorg-' + LLVM_VERSION
 [unix]
