@@ -16,7 +16,11 @@ example: (make-directory 'build')
 
 [unix]
 make-directory DIR:
-  @if [[ "{{ DIR }}" != '' ]]; then mkdir -p "{{ DIR }}"; fi
+  #! /bin/bash
+  if [[ "{{ DIR }}" != '' ]]
+  then
+      mkdir -p "{{ DIR }}"
+  fi
 
 [windows]
 make-directory DIR:
