@@ -20,7 +20,7 @@ make-directory DIR:
 
 [windows]
 make-directory DIR:
-  @New-Item -Path "{{ DIR }}" -ItemType Directory -Force | Out-Null
+  @if ("{{ DIR }}" -ne "") { New-Item -Path "{{ DIR }}" -ItemType Directory -Force | Out-Null }
 
 [windows]
 download-library LIB_DIR='lib/windows/x86_64' BIN_DIR='': (make-directory 'build/cache') (make-directory LIB_DIR) (make-directory BIN_DIR) (make-directory 'build/cache/llvm')
