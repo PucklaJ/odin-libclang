@@ -1,7 +1,7 @@
 set windows-shell := ['powershell.exe']
 
 RUNIC := 'runic'
-LLVM_VERSION := '19.1.7'
+LLVM_VERSION := '20.1.5'
 LIBRARY_DOWNLOAD_LINK := 'https://github.com/llvm/llvm-project/releases/download/llvmorg-' + LLVM_VERSION + '/clang+llvm-' + LLVM_VERSION + '-x86_64-pc-windows-msvc.tar.xz'
 
 default: bindings
